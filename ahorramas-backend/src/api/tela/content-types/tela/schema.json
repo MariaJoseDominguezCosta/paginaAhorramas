@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "telas",
+  "info": {
+    "singularName": "tela",
+    "pluralName": "telas",
+    "displayName": "Tela"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string"
+    },
+    "color_hex": {
+      "type": "string"
+    },
+    "tipo_aplicacion": {
+      "type": "enumeration",
+      "enum": [
+        "Base",
+        "Frente",
+        "Ambos"
+      ]
+    },
+    "material": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::material.material"
+    },
+    "archivo_textura": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

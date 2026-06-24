@@ -1,0 +1,75 @@
+{
+  "kind": "collectionType",
+  "collectionName": "muebles",
+  "info": {
+    "singularName": "mueble",
+    "pluralName": "muebles",
+    "displayName": "Mueble"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true
+    },
+    "codigo_producto": {
+      "type": "string"
+    },
+    "imagen_producto": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "badge_oferta": {
+      "type": "string"
+    },
+    "tipo_oferta": {
+      "type": "string"
+    },
+    "precio_lista_chiapas": {
+      "type": "decimal"
+    },
+    "precio_oferta_chiapas": {
+      "type": "decimal"
+    },
+    "precio_lista_tabasco": {
+      "type": "decimal"
+    },
+    "precio_oferta_tabasco": {
+      "type": "decimal"
+    },
+    "precio_lista_tapachula": {
+      "type": "decimal"
+    },
+    "precio_oferta_tapachula": {
+      "type": "decimal"
+    },
+    "categoria": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::categoria.categoria"
+    },
+    "variantes": {
+      "type": "component",
+      "component": "muebles.variante-color",
+      "repeatable": true
+    },
+    "calificacion": {
+      "type": "decimal"
+    },
+    "comentarios": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::comentario.comentario",
+      "mappedBy": "mueble"
+    }
+  }
+}

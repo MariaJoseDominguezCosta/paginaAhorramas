@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "comentarios",
+  "info": {
+    "singularName": "comentario",
+    "pluralName": "comentarios",
+    "displayName": "Comentario"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "autor": {
+      "type": "string"
+    },
+    "puntuacion": {
+      "type": "integer"
+    },
+    "titulo": {
+      "type": "string"
+    },
+    "comentario": {
+      "type": "text"
+    },
+    "ubicacion": {
+      "type": "string"
+    },
+    "mueble": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::mueble.mueble",
+      "inversedBy": "comentarios"
+    }
+  }
+}
