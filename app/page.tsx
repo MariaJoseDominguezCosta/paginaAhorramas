@@ -130,7 +130,7 @@ async function getStrapiProducts(): Promise<Product[]> {
     return json.data.map((item: StrapiMueble) => {
       const attrs = item.attributes || item;
       
-      const catData = attrs.categoria?.data?.attributes || {};
+      const catData = attrs.categoria?.data?.attributes || attrs.categoria || {};
       const categoriaNombre = catData.nombre || "Muebles";
       const categoriaIcono = catData.icono || "🛋️";
 
