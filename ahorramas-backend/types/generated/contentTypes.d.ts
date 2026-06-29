@@ -618,6 +618,34 @@ export interface ApiMuebleMueble extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiSuscriptorSuscriptor extends Struct.CollectionTypeSchema {
+  collectionName: 'suscriptores';
+  info: {
+    displayName: 'suscriptor';
+    pluralName: 'suscriptores';
+    singularName: 'suscriptor';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::suscriptor.suscriptor'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiTelaTela extends Struct.CollectionTypeSchema {
   collectionName: 'telas';
   info: {
@@ -1165,6 +1193,7 @@ declare module '@strapi/strapi' {
       'api::comentario.comentario': ApiComentarioComentario;
       'api::material.material': ApiMaterialMaterial;
       'api::mueble.mueble': ApiMuebleMueble;
+      'api::suscriptor.suscriptor': ApiSuscriptorSuscriptor;
       'api::tela.tela': ApiTelaTela;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

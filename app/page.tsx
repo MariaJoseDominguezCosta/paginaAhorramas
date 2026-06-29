@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  Search, User, ShoppingCart, Truck, PhoneCall, Percent, Medal, MapPin
+  Search, User, ShoppingCart, Truck, PhoneCall, Percent, Medal, MapPin, Menu, X
 } from "lucide-react";
+import Navbar from "@/components/layout/Navbar";
+import Newsletter from "@/components/layout/Newsletter";
 
 // Configuración de Strapi URL
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
@@ -121,6 +123,7 @@ export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false); // Control del menú lateral en móviles [4]
 
   // Carga de datos de Strapi en el cliente
   useEffect(() => {
@@ -133,7 +136,7 @@ export default function HomePage() {
         const mapped = json.data.map((item: StrapiMueble) => {
           const attrs = item.attributes || item;
 
-          // Parser dual robusto para Strapi v4 y v5 (corrige el error de "Muebles") [2]
+          // Parser dual robusto para Strapi v4 y v5 [2]
           const catData = attrs.categoria?.data?.attributes || attrs.categoria || {};
           const categoriaNombre = catData.nombre || "Muebles";
           const categoriaIcono = catData.icono || "🛋️";
@@ -197,63 +200,140 @@ export default function HomePage() {
         Descuento adicional en tu primera compra mayor a $10,000 | Garantía por defecto de fabrica | Soporte en línea
       </div>
 
-      {/* NAVBAR PRINCIPAL (Pegajoso con Buscador Activo) */}
-      <nav className="bg-[#F4F4F5] border-b border-[#E4E4E7] sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* NAVBAR PRINCIPAL RESPONSIVO */}
+      {/* <nav className="bg-[#F4F4F5] border-b border-[#E4E4E7] sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex flex-col gap-3"> */}
 
-          {/* Logo y Código Postal */}
-          <div className="flex flex-col ">
-            <Link href="/" className="font-extrabold text-[#CE2C3C] tracking-tight leading-none">
-              <img src="/images/logo.png" alt="Mueblerias Ahorramas" className="w-auto" />
+          {/* Fila principal del Navbar */}
+          {/* <div className="flex items-center justify-between gap-4"> */}
+
+            {/* Menú Hamburguesa (Sólo visible en móviles/tablets para desplegar categorías) */}
+            {/* <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-1 text-[#626264] hover:text-[#CE2C3C] transition md:hidden focus:outline-none"
+              aria-label="Abrir menú"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button> */}
+
+            {/* Logotipo de la Mueblería */}
+            {/* <div className="items-center sm:hidden md:flex flex-col gap-2 w-auto object-contain ">
+              <Link href="/">
+                <img src="/images/logo.png" alt="Mueblerías Ahorramás" className="md:h-12 w-auto object-contain" />
+              </Link> */}
+              {/* C.P. Selector alineado a la izquierda */}
+              {/* <div className="flex items-center gap-1.5 text-xs text-[#626264] cursor-pointer hover:text-[#CE2C3C] transition">
+                <MapPin className="w-4 h-4 text-zinc-800" />
+                <span>Enviar a: <strong className="underline text-[#CE2C3C]">Seleccionar C.P.</strong></span>
+              </div> */}
+
+            {/* </div>
+
+            <div className="flex-col gap-2 w-auto justify-items-center"> */}
+              {/* Buscador de Cápsula Redonda (Se oculta en móvil para ponerse abajo al 100%) */}
+              {/* <div className="hidden md:flex max-w-lg relative items-center w-full">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Busca salas, recámaras, comedores, colchones ..."
+                  className="w-full bg-[#FAFAFA] border border-zinc-300 rounded-full py-2.5 px-5 pr-12 text-sm text-[#1A1A1A] placeholder-zinc-500 outline-none focus:border-[#CE2C3C] focus:bg-white transition shadow-inner"
+                />
+                <Search className="w-5 h-5 text-zinc-600 absolute right-4 cursor-pointer" />
+
+              </div> */}
+                {/* Barra de Categorías */}
+                {/* <div className="hidden md:flex items-center pt-2 gap-4 lg:gap-5 text-[13px] font-semibold text-[#626264] overflow-x-auto text-center">
+                  <Link href="/" className="text-[#CE2C3C] hover:text-[#CE2C3C] transition">Inicio</Link>
+                  <Link href="/salas" className="hover:text-[#CE2C3C] transition">Salas</Link>
+                  <Link href="/recamaras" className="hover:text-[#CE2C3C] transition">Recámaras</Link>
+                  <Link href="/comedores" className="hover:text-[#CE2C3C] transition">Comedores</Link>
+                  <Link href="/colchones" className="hover:text-[#CE2C3C] transition">Colchones</Link>
+                  <Link href="/tv" className="hover:text-[#CE2C3C] transition">Muebles TV</Link>
+                  <Link href="/otros" className="hover:text-[#CE2C3C] transition">Otros Muebles</Link>
+                  <Link href="/nosotros" className="hover:text-[#CE2C3C] transition">Nosotros</Link>
+                </div>
+            </div> */}
+
+            {/* Acciones Responsivas: Las palabras se apilan debajo del icono en pantallas chicas y el botón de contactanos debajo de los botones de carrito y cuenta en pantallas medianas */}
+            {/* <div className="hidden lg:flex-row md:flex flex-col  items-center gap-3">
+              <div className="sm:hidden md:flex items-center gap-3">
+              <button className="flex lg:flex-row sm:flex-col items-center gap-1 sm:text-sm font-semibold text-[#626264] hover:text-[#CE2C3C] transition">
+                <ShoppingCart className="w-4 h-4  text-zinc-800" />
+                <span className="text-[10px] sm:text-xs">Carrito</span>
+              </button>
+              <button className="flex lg:flex-row sm:flex-col items-center gap-1 sm:text-sm font-semibold text-[#626264] hover:text-[#CE2C3C] transition">
+                <User className="w-4 h-4 text-zinc-800" />
+                <span className="text-[10px] sm:text-xs">Cuenta</span>
+              </button>
+              </div>
+              <button className="sm:hidden md:flex bg-[#CE2C3C] text-white px-3 py-1.5 rounded-full text-sm font-bold hover:bg-[#A8202D] transition shadow-sm">
+                Contáctanos
+              </button>
+            </div> */}
+
+            {/* Fila de Buscador Móvil y C.P. (Sólo visible en pantallas pequeñas) */}
+            {/* <div className="flex gap-2 w-full justify-items-center md:hidden ">
+              <div className="max-w-lg relative items-center w-full flex">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Busca salas, recámaras, comedores..."
+                  className="w-full bg-white border border-zinc-300 rounded-full py-2 px-4 pr-10 text-sm outline-none focus:border-[#CE2C3C] transition shadow-sm"
+                />
+                <Search className="w-4 h-4 text-[#626264] absolute right-3" />
+              </div> */}
+
+              {/* C.P. Selector simplificado*/}
+              {/* <div className="flex items-center gap-1 text-[11px] text-[#626264] cursor-pointer hover:text-[#CE2C3C] transition mt-1">
+                <span>📍 Enviar a: <strong className="underline text-[#CE2C3C]">Seleccionar C.P.</strong></span>
+              </div>
+              <div className="flex items-center gap-3 ">
+                <button className="flex-col items-center  gap-1 text-sm font-semibold text-[#626264] hover:text-[#CE2C3C] transition">
+                  <ShoppingCart className="w-4 h-4 text-zinc-800 justify-self-center" />
+                  <span className="text-xs">Carrito</span>
+                </button>
+                <button className="flex-col items-center gap-1 text-sm font-semibold text-[#626264] hover:text-[#CE2C3C] transition">
+                  <User className="w-4 h-4 text-zinc-800 justify-self-center" />
+                  <span className="text-xs">Cuenta</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div> */}
+
+
+
+        {/* MENÚ DESPLEGABLE MÓVIL (DRAWER) (Se activa al presionar el menú de hamburguesa) [4] */}
+        {/* <div className={`fixed inset-y-0 left-0 bg-white w-64 border-r border-[#E4E4E7] shadow-lg transform transition-transform duration-300 ease-in-out z-50 p-6 flex flex-col gap-6 md:hidden ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+          <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
+            <Link href="/" className="flex align-center justify-center flex-1">
+              <img src="/images/logo.png" alt="Mueblerías Ahorramás" className="h-8 md:h-12 w-auto object-contain" />
             </Link>
-            <span className="text-[11px] text-[#626264] mt-1.5 flex items-center gap-1 cursor-pointer hover:text-[#CE2C3C]">
-              📍 Enviar a: <strong className="underline">Seleccionar C.P.</strong>
-            </span>
-          </div>
-
-
-          <div className="size- inline-flex flex-col justify-center items-center gap-3.5">
-            {/* Buscador Activo en el Centro */}
-            <div className="w-full max-w-lg relative flex items-center">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder="Busca salas, recámaras, comedores, colchones ..."
-                className="w-full bg-white border border-[#E4E4E7] rounded-lg py-2 pl-4 pr-10 text-sm outline-none focus:border-[#CE2C3C] transition"
-              />
-              <Search className="w-4 h-4 text-[#626264] absolute right-3" />
-            </div>
-            {/* Sub-barra de categorías */}
-            <div className="self-stretch inline-flex justify-center items-center gap-6 overflow-x-auto text-[13px] font-semibold text-[#626264]">
-              <Link href="/" className="text-[#CE2C3C]">Inicio</Link>
-              <Link href="/salas" className="hover:text-[#CE2C3C] transition">Salas</Link>
-              <Link href="/recamaras" className="hover:text-[#CE2C3C] transition">Recámaras</Link>
-              <Link href="/comedores" className="hover:text-[#CE2C3C] transition">Comedores</Link>
-              <Link href="/colchones" className="hover:text-[#CE2C3C] transition">Colchones</Link>
-              <Link href="/tv" className="hover:text-[#CE2C3C] transition">Muebles Tv</Link>
-              <Link href="/otros" className="hover:text-[#CE2C3C] transition">Otros Muebles</Link>
-              <Link href="/nosotros" className="hover:text-[#CE2C3C] transition">Nosotros</Link>
-            </div>
-          </div>
-
-          {/* Acciones del Navbar */}
-          <div className="size- inline-flex justify-center items-center gap-4">
-            <button className="flex items-center gap-1.5 text-sm font-semibold text-[#626264] hover:text-[#CE2C3C] transition">
-              <ShoppingCart className="w-4 h-4" /> Carrito
+            <button onClick={() => setMobileMenuOpen(false)} className="text-[#626264] hover:text-[#CE2C3C]">
+              <X className="w-6 h-6" />
             </button>
-            <button className="flex items-center gap-1.5 text-sm font-semibold text-[#626264] hover:text-[#CE2C3C] transition">
-              <User className="w-4 h-4" /> Cuenta
-            </button>
-            <button className="bg-[#CE2C3C] text-white px-4 py-1.5 rounded-full text-xs font-bold hover:bg-[#A8202D] transition">
+          </div>
+          <div className="flex flex-col gap-4 text-sm font-semibold text-[#626264]">
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="text-[#CE2C3C]">Inicio</Link>
+            <Link href="/salas" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Salas</Link>
+            <Link href="/recamaras" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Recámaras</Link>
+            <Link href="/comedores" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Comedores</Link>
+            <Link href="/colchones" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Colchones</Link>
+            <Link href="/tv" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Muebles TV</Link>
+            <Link href="/otros" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Otros Muebles</Link>
+            <Link href="/nosotros" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Nosotros</Link>
+          </div>
+          <div className="border-t border-[#E4E4E7] pt-4 mt-auto">
+            <button className="w-full bg-[#CE2C3C] text-white py-2 rounded-md text-xs font-bold hover:bg-[#A8202D] transition shadow-sm mb-3">
               Contáctanos
             </button>
           </div>
         </div>
-
-
       </nav>
-
+       */}
+      <Navbar/>
       {/* RENDERIZADO CONDICIONAL DE BÚSQUEDA */}
       {searchQuery.trim().length > 0 ? (
 
@@ -261,7 +341,7 @@ export default function HomePage() {
         <section className="max-w-7xl mx-auto px-6 mt-12 mb-20 min-h-[400px]">
           <div className="mb-6">
             <h3 className="text-2xl font-extrabold font-title flex items-center gap-1.5">
-              Resultados de búsqueda para: <span className="text-[#CE2C3C]">"{searchQuery}"</span>
+              Resultados de búsqueda para: <span className="text-[#CE2C3C]">&apos;{searchQuery}&apos;</span>
             </h3>
             <p className="text-sm text-[#626264] mt-0.5">{filteredProducts.length} productos encontrados</p>
           </div>
@@ -470,7 +550,8 @@ export default function HomePage() {
       </section>
 
       {/* NEWSLETTER */}
-      <section className="bg-[#F4F4F5] py-12 border-b border-[#E4E4E7]">
+      <Newsletter/>
+      {/* <section className="bg-[#F4F4F5] py-12 border-b border-[#E4E4E7]">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <h4 className="text-lg font-bold font-title">Recibe nuestras ofertas</h4>
@@ -481,14 +562,14 @@ export default function HomePage() {
             <button className="bg-[#CE2C3C] text-white text-xs font-bold px-6 py-2.5 rounded-md hover:bg-[#A8202D] transition">Suscribirme</button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* FOOTER */}
       <footer className="bg-[#18181B] text-zinc-400 py-12 text-[13px] border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <div className="font-extrabold text-lg text-white mb-4">
-              Mueblerías <span className="text-[#CE2C3C]">Ahorramás</span>
+              <img src="/images/logo.png" alt="Mueblerías Ahorramás" className="h-12 w-auto object-contain" />
             </div>
             <p className="line-clamp-4 leading-relaxed mb-6">
               La cadena de mueblerías número 1 en Chiapas y Tabasco. Calidad y elegancia a precios inigualables desde 2003.
