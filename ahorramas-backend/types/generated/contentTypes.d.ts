@@ -621,7 +621,7 @@ export interface ApiMuebleMueble extends Struct.CollectionTypeSchema {
 export interface ApiSuscriptorSuscriptor extends Struct.CollectionTypeSchema {
   collectionName: 'suscriptores';
   info: {
-    displayName: 'suscriptor';
+    displayName: 'Suscriptor';
     pluralName: 'suscriptores';
     singularName: 'suscriptor';
   };

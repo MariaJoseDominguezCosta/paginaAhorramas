@@ -1,19 +1,83 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, User, ShoppingCart, MapPin, Menu, X } from "lucide-react";
+import {
+    CATEGORY_COLOR_CLASSES,
+    CATEGORY_NAV_ITEMS,
+    categoryFromPathname,
+    normalizeCategoryToNavKey,
+} from "@/lib/categoryNavigation";
 
 export default function Navbar() {
     const router = useRouter();
-    const [query, setQuery] = useState("");
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const searchQueryInUrl = searchParams.get("q") || "";
+    const [query, setQuery] = useState(searchQueryInUrl);
+    const [isNavbarSearching, setIsNavbarSearching] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const queryCategory =
+        searchParams.get("categoria") || searchParams.get("cat");
+    const activeCategory =
+        normalizeCategoryToNavKey(queryCategory) || categoryFromPathname(pathname);
+
+    function getLinkClass(href: string, key?: keyof typeof CATEGORY_COLOR_CLASSES) {
+        if (key && activeCategory === key) {
+            return `${CATEGORY_COLOR_CLASSES[key].active} transition`;
+        }
+
+        if (href === "/" && pathname === "/" && !activeCategory) {
+            return "text-[#CE2C3C] hover:text-[#CE2C3C] transition";
+        }
+
+        if (key) {
+            return `text-[#626264] ${CATEGORY_COLOR_CLASSES[key].hover} transition`;
+        }
+
+        return "text-[#626264] hover:text-[#CE2C3C] transition";
+    }
 
     function handleSearch(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const cleanQuery = query.trim();
+        const cleanQuery = (isNavbarSearching ? query : searchQueryInUrl).trim();
         if (cleanQuery) router.push(`/buscar?q=${encodeURIComponent(cleanQuery)}`);
+    }
+
+    useEffect(() => {
+        if (!isNavbarSearching) return;
+
+        const handler = setTimeout(() => {
+            const cleanQuery = query.trim();
+
+            if (!cleanQuery) {
+                if (pathname === "/buscar" && searchQueryInUrl) {
+                    router.replace("/buscar", { scroll: false });
+                }
+                return;
+            }
+
+            if (pathname === "/buscar" && searchQueryInUrl === cleanQuery) {
+                return;
+            }
+
+            router.replace(`/buscar?q=${encodeURIComponent(cleanQuery)}`, { scroll: false });
+        }, 280);
+
+        return () => clearTimeout(handler);
+    }, [isNavbarSearching, pathname, query, router, searchQueryInUrl]);
+
+    function handleNavbarQueryChange(value: string) {
+        setIsNavbarSearching(true);
+        setQuery(value);
+    }
+
+    function stopNavbarSearchSync() {
+        setIsNavbarSearching(false);
+        setQuery(searchQueryInUrl);
     }
 
     return (
@@ -50,8 +114,10 @@ export default function Navbar() {
                         <form onSubmit={handleSearch} className="hidden md:flex max-w-lg relative items-center w-full">
                             <input
                                 type="text"
-                                value={query}
-                                onChange={(event) => setQuery(event.target.value)}
+                                value={isNavbarSearching ? query : searchQueryInUrl}
+                                onFocus={() => setIsNavbarSearching(true)}
+                                onBlur={stopNavbarSearchSync}
+                                onChange={(event) => handleNavbarQueryChange(event.target.value)}
                                 placeholder="Busca salas, recámaras, comedores, colchones ..."
                                 className="w-full bg-[#FAFAFA] border border-zinc-300 rounded-full py-2.5 px-5 pr-12 text-sm text-[#1A1A1A] placeholder-zinc-500 outline-none focus:border-[#CE2C3C] focus:bg-white transition shadow-inner"
                             />
@@ -60,14 +126,11 @@ export default function Navbar() {
                         </form>
                         {/* Barra de Categorías */}
                         <div className="hidden md:flex items-center pt-2 gap-4 lg:gap-5 text-[13px] font-semibold text-[#626264] overflow-x-auto text-center">
-                            <Link href="/" className="text-[#CE2C3C] hover:text-[#CE2C3C] transition">Inicio</Link>
-                            <Link href="/salas" className="hover:text-[#CE2C3C] transition">Salas</Link>
-                            <Link href="/recamaras" className="hover:text-[#CE2C3C] transition">Recámaras</Link>
-                            <Link href="/comedores" className="hover:text-[#CE2C3C] transition">Comedores</Link>
-                            <Link href="/colchones" className="hover:text-[#CE2C3C] transition">Colchones</Link>
-                            <Link href="/tv" className="hover:text-[#CE2C3C] transition">Muebles TV</Link>
-                            <Link href="/otros" className="hover:text-[#CE2C3C] transition">Otros Muebles</Link>
-                            <Link href="/nosotros" className="hover:text-[#CE2C3C] transition">Nosotros</Link>
+                            {CATEGORY_NAV_ITEMS.map((item) => (
+                                <Link key={item.label} href={item.href} className={getLinkClass(item.href, item.key)}>
+                                    {item.label}
+                                </Link>
+                            ))}
                         </div>
                     </div>
 
@@ -93,9 +156,10 @@ export default function Navbar() {
                         <form onSubmit={handleSearch} className="max-w-lg relative items-center w-full flex">
                             <input
                                 type="text"
-                                value={query}
-
-                                onChange={(event) => setQuery(event.target.value)}
+                                value={isNavbarSearching ? query : searchQueryInUrl}
+                                onFocus={() => setIsNavbarSearching(true)}
+                                onBlur={stopNavbarSearchSync}
+                                onChange={(event) => handleNavbarQueryChange(event.target.value)}
                                 placeholder="Busca salas, recámaras, comedores..."
                                 className="w-full bg-white border border-zinc-300 rounded-full py-2 px-4 pr-10 text-sm outline-none focus:border-[#CE2C3C] transition shadow-sm"
                             />
@@ -133,14 +197,16 @@ export default function Navbar() {
                     </button>
                 </div>
                 <div className="flex flex-col gap-4 text-sm font-semibold text-[#626264]">
-                    <Link href="/" onClick={() => setMobileMenuOpen(false)} className="text-[#CE2C3C]">Inicio</Link>
-                    <Link href="/salas" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Salas</Link>
-                    <Link href="/recamaras" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Recámaras</Link>
-                    <Link href="/comedores" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Comedores</Link>
-                    <Link href="/colchones" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Colchones</Link>
-                    <Link href="/tv" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Muebles TV</Link>
-                    <Link href="/otros" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Otros Muebles</Link>
-                    <Link href="/nosotros" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#CE2C3C] transition">Nosotros</Link>
+                    {CATEGORY_NAV_ITEMS.map((item) => (
+                        <Link
+                            key={item.label}
+                            href={item.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={getLinkClass(item.href, item.key)}
+                        >
+                            {item.label}
+                        </Link>
+                    ))}
                 </div>
                 <div className="border-t border-[#E4E4E7] pt-4 mt-auto">
                     <button className="w-full bg-[#CE2C3C] text-white py-2 rounded-md text-xs font-bold hover:bg-[#A8202D] transition shadow-sm mb-3">

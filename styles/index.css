@@ -1,5 +1,4 @@
 @import './tailwind.css';
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 /* Import Tailwind CSS */
 
 /* Import Google Fonts */
@@ -32,13 +31,10 @@ html {
 /* Link styles */
 a {
   text-decoration: none;
-  color: inherit;
 }
 
 /* Button reset */
 button {
-  border: none;
-  background: none;
   cursor: pointer;
   font-family: inherit;
 }

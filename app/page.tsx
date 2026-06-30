@@ -9,7 +9,7 @@ import Navbar from "@/components/layout/Navbar";
 import Newsletter from "@/components/layout/Newsletter";
 
 // Configuración de Strapi URL
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
 // Interfaz para el tipado interno de productos en Next.js
 interface Product {
@@ -65,52 +65,6 @@ interface StrapiMueblesResponse {
   data: StrapiMueble[];
 }
 
-// Icono personalizado de Facebook (SVG directo de marca)
-const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-  </svg>
-);
-
-// Icono personalizado de Instagram (SVG directo de marca)
-const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
-
-// Icono personalizado de WhatsApp (SVG directo de marca)
-const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-  </svg>
-);
 
 // Resuelve la URL completa de medios de Strapi (antepone http://localhost:1337)
 function getStrapiMedia(url: string | null) {
@@ -194,12 +148,6 @@ export default function HomePage() {
 
   return (
     <div className="bg-[#FAFAFA] min-h-screen text-[#1A1A1A] font-sans antialiased">
-
-      {/* BARRA SUPERIOR ROJA */}
-      <div className="bg-[#CE2C3C] text-white text-[11px] md:text-[13px] font-medium text-center py-2 px-4 tracking-wide">
-        Descuento adicional en tu primera compra mayor a $10,000 | Garantía por defecto de fabrica | Soporte en línea
-      </div>
-
       {/* NAVBAR PRINCIPAL RESPONSIVO */}
       {/* <nav className="bg-[#F4F4F5] border-b border-[#E4E4E7] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex flex-col gap-3"> */}
@@ -333,7 +281,7 @@ export default function HomePage() {
         </div>
       </nav>
        */}
-      <Navbar/>
+      
       {/* RENDERIZADO CONDICIONAL DE BÚSQUEDA */}
       {searchQuery.trim().length > 0 ? (
 
@@ -351,9 +299,9 @@ export default function HomePage() {
               No se encontraron muebles que coincidan con tu búsqueda.
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center">
               {filteredProducts.map((item) => (
-                <div key={`search-${item.id}`} className="bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+                <div key={`search-${item.id}`} className="w-full max-w-[320px] bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
                   <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
                     {item.badge_oferta && (
                       <span className="absolute top-2 left-2 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full z-10">{item.badge_oferta}</span>
@@ -367,7 +315,7 @@ export default function HomePage() {
                   <div className="p-4">
                     <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
                     <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
-                    <Link href={`/producto/${item.id}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
+                    <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
                       Ver producto
                     </Link>
                   </div>
@@ -410,9 +358,9 @@ export default function HomePage() {
               </h3>
               <p className="text-sm text-[#626264] mt-0.5">Lo recién agregado en esta temporada</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {products.slice(0, 4).map((item) => (
-                <div key={`nuevo-${item.id}`} className="bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {products.map((item) => (
+                <div key={`nuevo-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
                   <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
                     <span className="absolute top-2 left-2 bg-[#FEF9C3] text-[#854D0E] text-[10px] font-bold px-2 py-0.5 rounded-full z-10">Nuevo</span>
                     {item.imagenUrl ? (
@@ -424,7 +372,7 @@ export default function HomePage() {
                   <div className="p-4">
                     <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
                     <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
-                    <Link href={`/producto/${item.id}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
+                    <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
                       Ver producto
                     </Link>
                   </div>
@@ -439,9 +387,9 @@ export default function HomePage() {
               <h3 className="text-2xl font-extrabold font-title">Favoritos</h3>
               <p className="text-sm text-[#626264] mt-0.5">Los mejores calificados de los usuarios</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {products.slice(0, 4).map((item) => (
-                <div key={`fav-${item.id}`} className="bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {products.map((item) => (
+                <div key={`fav-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
                   <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
                     {item.imagenUrl ? (
                       <img src={item.imagenUrl} alt={item.nombre} className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" />
@@ -452,7 +400,7 @@ export default function HomePage() {
                   <div className="p-4">
                     <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
                     <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
-                    <Link href={`/producto/${item.id}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
+                    <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
                       Ver producto
                     </Link>
                   </div>
@@ -466,9 +414,9 @@ export default function HomePage() {
             <div className="mb-6">
               <h3 className="text-2xl font-extrabold font-title">En <span className="text-[#CE2C3C]">oferta</span></h3>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {products.slice(0, 4).map((item) => (
-                <div key={`oferta-${item.id}`} className="bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {products.map((item) => (
+                <div key={`oferta-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
                   <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
                     <span className="absolute top-2 left-2 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full z-10">{item.badge_oferta || "Oferta 30%"}</span>
                     <span className="absolute bottom-2 right-2 bg-[#FDE8EA] text-[#A8202D] text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase z-10">{item.tipo_oferta || "Hot Sale"}</span>
@@ -481,7 +429,7 @@ export default function HomePage() {
                   <div className="p-4">
                     <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
                     <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
-                    <Link href={`/producto/${item.id}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
+                    <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
                       Ver producto
                     </Link>
                   </div>
@@ -496,9 +444,9 @@ export default function HomePage() {
               <h3 className="text-2xl font-extrabold font-title">Productos <span className="text-[#CE2C3C]">destacados</span></h3>
               <p className="text-sm text-[#626264] mt-0.5">Los más vendidos de esta temporada</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {products.slice(0, 4).map((item) => (
-                <div key={`destacado-${item.id}`} className="bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {products.map((item) => (
+                <div key={`destacado-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
                   <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
                     <span className="absolute top-2 left-2 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full z-10">{item.badge_oferta || "Oferta 30%"}</span>
                     <span className="absolute bottom-2 right-2 bg-[#FDE8EA] text-[#A8202D] text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase z-10">{item.tipo_oferta || "Hot Sale"}</span>
@@ -511,7 +459,7 @@ export default function HomePage() {
                   <div className="p-4">
                     <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
                     <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
-                    <Link href={`/producto/${item.id}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
+                    <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-[#FAFAFA] text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
                       Ver producto
                     </Link>
                   </div>
@@ -522,7 +470,7 @@ export default function HomePage() {
         </>
       )}
 
-      {/* TRUST STRIP (MUEBLERÍAS AHORRAMÁS) */}
+      {/* TRUST STRIP (MUEBLERÍAS AHORRAMÁS)
       <section className="bg-white border-t border-b border-[#E4E4E7] py-8">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="flex items-center gap-3">
@@ -547,25 +495,10 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* NEWSLETTER */}
-      <Newsletter/>
-      {/* <section className="bg-[#F4F4F5] py-12 border-b border-[#E4E4E7]">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h4 className="text-lg font-bold font-title">Recibe nuestras ofertas</h4>
-            <p className="text-xs text-[#626264] mt-1">Suscríbete y sé el primero en enterarte de descuentos y nuevos modelos.</p>
-          </div>
-          <div className="flex w-full md:w-auto max-w-md gap-2">
-            <input type="email" placeholder="tu@correo.com" className="bg-white border border-[#E4E4E7] rounded-md px-4 py-2 text-sm flex-1 outline-none focus:border-[#CE2C3C]" />
-            <button className="bg-[#CE2C3C] text-white text-xs font-bold px-6 py-2.5 rounded-md hover:bg-[#A8202D] transition">Suscribirme</button>
-          </div>
-        </div>
       </section> */}
 
       {/* FOOTER */}
-      <footer className="bg-[#18181B] text-zinc-400 py-12 text-[13px] border-b border-zinc-800">
+      {/* <footer className="bg-[#18181B] text-zinc-400 py-12 text-[13px] border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <div className="font-extrabold text-lg text-white mb-4">
@@ -582,7 +515,7 @@ export default function HomePage() {
                 <InstagramIcon className="w-4 h-4" />
               </span>
               {/* Se añade el icono de WhatsApp en el footer tal como en el mockup */}
-              <span className="w-8 h-8 rounded-md bg-zinc-800 flex items-center justify-center hover:bg-[#CE2C3C] hover:text-white cursor-pointer transition">
+              {/* <span className="w-8 h-8 rounded-md bg-zinc-800 flex items-center justify-center hover:bg-[#CE2C3C] hover:text-white cursor-pointer transition">
                 <WhatsAppIcon className="w-4 h-4" />
               </span>
             </div>
@@ -613,12 +546,12 @@ export default function HomePage() {
             <p>✉️ info@muebleriasahorramas.com.mx</p>
           </div>
         </div>
-      </footer>
+      </footer> */}
 
       {/* COPYRIGHT */}
-      <div className="bg-[#0F0F10] text-[11px] text-zinc-600 py-4 text-center">
-        Copyright © 2003 Mueblerías Ahorra Mas. Todos los derechos reservados.
-      </div>
+      {/* // <div className="bg-[#0F0F10] text-[11px] text-zinc-600 py-4 text-center">
+      //   Copyright © 2003 Mueblerías Ahorra Mas. Todos los derechos reservados.
+      // </div> */}
 
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import {
     Armchair,
     ChevronDown,
@@ -20,6 +20,11 @@ import {
     User,
     X,
 } from "lucide-react";
+import {
+    CATEGORY_COLOR_CLASSES,
+    CATEGORY_NAV_ITEMS,
+    normalizeCategoryToNavKey,
+} from "@/lib/categoryNavigation";
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
@@ -92,17 +97,6 @@ const catalogPopulateQuery = new URLSearchParams({
     "populate[imagen_producto]": "true",
     "populate[categoria]": "true",
 });
-
-const navItems = [
-    "Inicio",
-    "Salas",
-    "Recámaras",
-    "Comedores",
-    "Colchones",
-    "Muebles TV",
-    "Otros Muebles",
-    "Nosotros",
-];
 
 function asRecord(value: unknown): UnknownRecord {
     return value && typeof value === "object" ? (value as UnknownRecord) : {};
@@ -296,6 +290,7 @@ function SocialIcon({ label, children }: { label: string; children: React.ReactN
 
 export default function ProductDetailPage() {
     const params = useParams<{ id: string }>();
+    const searchParams = useSearchParams();
     const id = params?.id;
     const [product, setProduct] = useState<ProductDetail | null>(null);
     const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
@@ -347,9 +342,9 @@ export default function ProductDetailPage() {
                 setSelectedFrenteTela(frontInitial?.tela || "");
                 setSelectedGalleryImage("");
 
-        const catalogData: unknown[] = Array.isArray(jsonCatalog.data)
-          ? jsonCatalog.data
-          : [];
+                const catalogData: unknown[] = Array.isArray(jsonCatalog.data)
+                    ? jsonCatalog.data
+                    : [];
                 setRelatedProducts(
                     catalogData
                         .map(mapRelatedProduct)
@@ -427,90 +422,28 @@ export default function ProductDetailPage() {
         .map((variant) => getStrapiMedia(variant.imagen))
         .filter((image): image is string => Boolean(image));
     const thumbnails = Array.from(new Set([...galleryImages, ...variantImages])).slice(0, 5);
+    const queryCategory = searchParams.get("categoria") || searchParams.get("cat");
+    const activeCategory =
+        normalizeCategoryToNavKey(product.categoria) || normalizeCategoryToNavKey(queryCategory);
+
+    function getCategoryLinkClass(href: string, key?: keyof typeof CATEGORY_COLOR_CLASSES) {
+        if (key && activeCategory === key) {
+            return `${CATEGORY_COLOR_CLASSES[key].active} transition`;
+        }
+
+        if (key) {
+            return `hover:font-semibold text-zinc-600 ${CATEGORY_COLOR_CLASSES[key].hover} transition`;
+        }
+
+        if (href === "/") {
+            return "text-[#d12d3d] transition";
+        }
+
+        return "text-zinc-600 hover:text-[#d12d3d] transition";
+    }
 
     return (
         <div className="min-h-screen bg-[#f5f5f6] text-[#202124]">
-            <div className="bg-[#d12d3d] px-4 py-2 text-center text-[11px] font-semibold tracking-wide text-white md:text-xs">
-                Descuento adicional en tu primera compra mayor a $10,000 | Garantía por defecto de fábrica | Soporte en línea
-            </div>
-
-            <header className="sticky top-0 z-40 border-b border-zinc-200 bg-[#f7f7f8]/95 backdrop-blur">
-                <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 lg:px-8">
-                    <button
-                        type="button"
-                        aria-label="Abrir menú"
-                        className="rounded-md p-2 text-zinc-700 md:hidden"
-                        onClick={() => setMobileMenuOpen((open) => !open)}
-                    >
-                        {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                    </button>
-
-                    <Link href="/" className="shrink-0">
-                        <img
-                            src="/images/logo.png"
-                            alt="Mueblerías Ahorramás"
-                            className="h-11 w-auto object-contain"
-                        />
-                    </Link>
-
-                    <div className="hidden min-w-[145px] items-center gap-2 text-xs text-zinc-600 lg:flex">
-                        <MapPin className="h-5 w-5 text-zinc-800" />
-                        <span>
-                            Enviar a:{" "}
-                            <button
-                                type="button"
-                                className="font-bold text-[#d12d3d] underline underline-offset-2"
-                            >
-                                Seleccionar C.P.
-                            </button>
-                        </span>
-                    </div>
-
-                    <label className="relative mx-auto hidden w-full max-w-xl md:block">
-                        <span className="sr-only">Buscar productos</span>
-                        <input
-                            className="h-11 w-full rounded-full border border-zinc-300 bg-white px-6 pr-12 text-sm text-zinc-700 shadow-sm outline-none placeholder:text-zinc-500"
-                            placeholder="Busca salas, recámaras, comedores, colchones ..."
-                        />
-                        <Search className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-600" />
-                    </label>
-
-                    <div className="ml-auto flex items-center gap-3 text-sm font-semibold text-zinc-700">
-                        <button type="button" className="hidden items-center gap-1 md:flex">
-                            <ShoppingCart className="h-5 w-5" />
-                            Carrito
-                        </button>
-                        <button type="button" className="hidden items-center gap-1 md:flex">
-                            <User className="h-5 w-5" />
-                            Cuenta
-                        </button>
-                        <button
-                            type="button"
-                            className="rounded-full bg-[#d12d3d] px-5 py-2.5 text-sm font-bold text-white"
-                            onClick={() => openWhatsApp("Hola, quiero recibir asesoría de Mueblerías Ahorramás.")}
-                        >
-                            Contáctanos
-                        </button>
-                    </div>
-                </div>
-
-                <nav
-                    className={`${mobileMenuOpen ? "block" : "hidden"} border-t border-zinc-200 bg-white md:block md:border-0 md:bg-transparent`}
-                >
-                    <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-3 text-sm font-semibold text-zinc-600 md:flex-row md:items-center md:justify-center md:gap-8 md:py-0 lg:px-8">
-                        {navItems.map((item) => (
-                            <Link
-                                key={item}
-                                href={item === "Inicio" ? "/" : "#"}
-                                className={item === "Inicio" ? "text-[#d12d3d]" : "hover:text-[#d12d3d]"}
-                            >
-                                {item}
-                            </Link>
-                        ))}
-                    </div>
-                </nav>
-            </header>
-
             <main className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
                 <div className="mb-5 text-xs text-zinc-500">
                     Inicio / Catálogo / {product.categoria} /{" "}
@@ -541,8 +474,8 @@ export default function ProductDetailPage() {
                                         key={image}
                                         onClick={() => setSelectedGalleryImage(image)}
                                         className={`h-16 rounded-lg border bg-white p-1 transition sm:h-20 ${(selectedGalleryImage || mainImage) === image
-                                                ? "border-[#d12d3d] ring-2 ring-[#f8c9cf]"
-                                                : "border-zinc-200 hover:border-zinc-300"
+                                            ? "border-[#d12d3d] ring-2 ring-[#f8c9cf]"
+                                            : "border-zinc-200 hover:border-zinc-300"
                                             }`}
                                     >
                                         <img
@@ -619,8 +552,8 @@ export default function ProductDetailPage() {
                                     <Star
                                         key={index}
                                         className={`h-6 w-6 ${index < Math.round(product.calificacion)
-                                                ? "fill-current"
-                                                : "fill-zinc-200 text-zinc-200"
+                                            ? "fill-current"
+                                            : "fill-zinc-200 text-zinc-200"
                                             }`}
                                     />
                                 ))}
@@ -782,8 +715,6 @@ export default function ProductDetailPage() {
                 <ReviewsSection product={product} />
             </main>
 
-            <Newsletter />
-            <Footer />
         </div>
     );
 }
@@ -813,8 +744,8 @@ function VariantPicker({
                         key={variant.id}
                         onClick={() => onSelect(variant)}
                         className={`flex h-14 items-center gap-2 rounded-lg border px-3 text-left text-xs font-bold transition ${selected === variant.tela
-                                ? "border-[#d12d3d] bg-[#fde8eb] text-[#d12d3d] ring-2 ring-[#f8c9cf]"
-                                : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300"
+                            ? "border-[#d12d3d] bg-[#fde8eb] text-[#d12d3d] ring-2 ring-[#f8c9cf]"
+                            : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300"
                             }`}
                     >
                         <span
@@ -886,7 +817,7 @@ function ProductRail({
                                     {formatCurrency(prices.oferta)}
                                 </div>
                                 <Link
-                                    href={`/producto/${product.id}`}
+                                    href={`/producto/${product.id}?categoria=${encodeURIComponent(product.categoria)}`}
                                     className="mt-4 block rounded-lg bg-[#d12d3d] px-4 py-3 text-center text-sm font-extrabold text-white transition hover:bg-[#b72432]"
                                 >
                                     Ver producto
@@ -924,8 +855,8 @@ function ReviewsSection({ product }: { product: ProductDetail }) {
                             <Star
                                 key={index}
                                 className={`h-4 w-4 ${index < Math.round(product.calificacion)
-                                        ? "fill-current"
-                                        : "fill-zinc-200 text-zinc-200"
+                                    ? "fill-current"
+                                    : "fill-zinc-200 text-zinc-200"
                                     }`}
                             />
                         ))}
@@ -965,8 +896,8 @@ function ReviewsSection({ product }: { product: ProductDetail }) {
                                             <Star
                                                 key={index}
                                                 className={`h-3.5 w-3.5 ${index < (comment.puntuacion || 5)
-                                                        ? "fill-current"
-                                                        : "fill-zinc-200 text-zinc-200"
+                                                    ? "fill-current"
+                                                    : "fill-zinc-200 text-zinc-200"
                                                     }`}
                                             />
                                         ))}

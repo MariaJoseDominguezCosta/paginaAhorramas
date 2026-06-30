@@ -70,14 +70,14 @@ export default function Newsletter() {
                             value={email}
                             onChange={(event) => setEmail(event.target.value)}
                             placeholder="tu@correo.com"
-                            className="bg-white border border-[#E4E4E7] rounded-md px-4 py-2 text-sm flex-1 outline-none focus:border-[#CE2C3C]"
+                            className="bg-[#FAFAFA] border border-[#E4E4E7] rounded-md px-4 py-2 text-sm text-[#1A1A1A] flex-1 outline-none focus:border-[#CE2C3C]"
                             disabled={status === "loading"}
                         />
 
                         <button
                             type="submit"
                             disabled={status === "loading"}
-                            className="h-12 rounded-lg bg-[#CE2C3C] px-6 text-sm font-bold text-white transition hover:bg-[#A8202D] disabled:cursor-not-allowed disabled:opacity-70"
+                            className="h-12 rounded-lg bg-[#CE2C3C] px-6 text-sm font-bold text-[#FAFAFA] transition hover:bg-[#A8202D] disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             {status === "loading" ? "Enviando..." : "Suscribirme"}
                         </button>
