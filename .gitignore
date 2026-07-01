@@ -40,3 +40,9 @@ yarn-error.log*
 next-env.d.ts
 
 /.vscode
+/app/dist
+/components/layout/dist
+/components/providers/dist
+/lib/dist
+/app/buscar/dist
+/data/postal-codes

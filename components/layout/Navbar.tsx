@@ -31,7 +31,7 @@ export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [postalModalOpen, setPostalModalOpen] = useState(false);
     const [postalModalDismissedForSession, setPostalModalDismissedForSession] = useState(() => {
-        if (typeof window === "undefined") return false;
+        if (typeof window === "undefined") return true; // Always dismissed on server to prevent hydration mismatch
         return window.sessionStorage.getItem(POSTAL_MODAL_DISMISSED_KEY) === "1";
     });
 
@@ -224,9 +224,7 @@ export default function Navbar() {
                                 </button>
                             )}
                         </div>
-                        {postalCodeMessage && (
-                            <p className="text-[10px] text-zinc-500">{postalCodeMessage}</p>
-                        )}
+                        
                         {hasValidPostalCode && region && (
                             <p className="text-[10px] font-semibold text-zinc-600">
                                 Zona activa: <span className="text-[#CE2C3C]">{formatRegionLabel(region)}</span>
@@ -412,15 +410,6 @@ export default function Navbar() {
                             </div>
                         )}
 
-                        {hasValidPostalCode && (
-                            <button
-                                type="button"
-                                onClick={handlePostalCodeClear}
-                                className="mt-4 text-xs font-bold text-zinc-500 underline hover:text-[#CE2C3C]"
-                            >
-                                Limpiar C.P.
-                            </button>
-                        )}
                     </div>
                 </div>
             )}
