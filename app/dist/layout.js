@@ -6,6 +6,7 @@ var Navbar_1 = require("@/components/layout/Navbar");
 var TrustBar_1 = require("@/components/layout/TrustBar");
 var Newsletter_1 = require("@/components/layout/Newsletter");
 var Footer_1 = require("@/components/layout/Footer");
+var LocationProvider_1 = require("@/components/providers/LocationProvider");
 require("../styles/tailwind.css");
 require("../styles/index.css");
 exports.metadata = {
@@ -28,11 +29,12 @@ function RootLayout(_a) {
     var children = _a.children;
     return (React.createElement("html", { lang: "en", className: "h-full antialiased" },
         React.createElement("body", { className: "min-h-full flex flex-col" },
-            React.createElement(TopPromoBar_1["default"], null),
-            React.createElement(Navbar_1["default"], null),
-            children,
-            React.createElement(TrustBar_1["default"], null),
-            React.createElement(Newsletter_1["default"], null),
-            React.createElement(Footer_1["default"], null))));
+            React.createElement(LocationProvider_1.LocationProvider, null,
+                React.createElement(TopPromoBar_1["default"], null),
+                React.createElement(Navbar_1["default"], null),
+                children,
+                React.createElement(TrustBar_1["default"], null),
+                React.createElement(Newsletter_1["default"], null),
+                React.createElement(Footer_1["default"], null)))));
 }
 exports["default"] = RootLayout;

@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import TrustBar from "@/components/layout/TrustBar";
 import Newsletter from "@/components/layout/Newsletter";
 import Footer from "@/components/layout/Footer";
+import { LocationProvider } from "@/components/providers/LocationProvider";
 import "../styles/tailwind.css"; 
 import "../styles/index.css";
 
@@ -37,14 +38,16 @@ export default function RootLayout({
       className={`h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <TopPromoBar />
-        <Navbar />
-      
-        {children}
+        <LocationProvider>
+          <TopPromoBar />
+          <Navbar />
 
-        <TrustBar />
-        <Newsletter />
-        <Footer />
+          {children}
+
+          <TrustBar />
+          <Newsletter />
+          <Footer />
+        </LocationProvider>
         </body>
     </html>
   );

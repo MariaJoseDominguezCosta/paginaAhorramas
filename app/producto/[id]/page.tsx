@@ -13,10 +13,11 @@ import {
     Star,
     Tv,
 } from "lucide-react";
+import { useLocation } from "@/components/providers/LocationProvider";
+import { getActivePrices } from "@/lib/pricing";
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
-type Region = "chiapas" | "tabasco" | "tapachula";
 type ApplicationType = "Base" | "Frente" | "Ambos";
 type UnknownRecord = Record<string, unknown>;
 
@@ -128,39 +129,6 @@ function formatCurrency(value: number) {
         currency: "MXN",
         maximumFractionDigits: 2,
     }).format(value);
-}
-
-function getActivePrices(
-    item: {
-        precio_lista_chiapas?: number;
-        precio_oferta_chiapas?: number;
-        precio_lista_tabasco?: number;
-        precio_oferta_tabasco?: number;
-        precio_lista_tapachula?: number;
-        precio_oferta_tapachula?: number;
-    },
-    region: Region,
-) {
-    const pricesByRegion = {
-        chiapas: {
-            lista: item.precio_lista_chiapas || 0,
-            oferta: item.precio_oferta_chiapas || 0,
-        },
-        tabasco: {
-            lista: item.precio_lista_tabasco || 0,
-            oferta: item.precio_oferta_tabasco || 0,
-        },
-        tapachula: {
-            lista: item.precio_lista_tapachula || 0,
-            oferta: item.precio_oferta_tapachula || 0,
-        },
-    };
-
-    const selected = pricesByRegion[region];
-    return {
-        lista: selected.lista || selected.oferta,
-        oferta: selected.oferta || selected.lista,
-    };
 }
 
 function normalizeApplicationType(value: string): ApplicationType {
@@ -276,8 +244,8 @@ export default function ProductDetailPage() {
     const [selectedFrenteTela, setSelectedFrenteTela] = useState("");
     const [selectedGalleryImage, setSelectedGalleryImage] = useState("");
     const [quantity, setQuantity] = useState(1);
-    const [region, setRegion] = useState<Region>("chiapas");
     const [specsOpen, setSpecsOpen] = useState(true);
+    const { region, hasValidPostalCode } = useLocation();
 
     useEffect(() => {
         let ignore = false;
@@ -376,8 +344,8 @@ export default function ProductDetailPage() {
         );
     }
 
-    const prices = getActivePrices(product, region);
-    const savings = Math.max(prices.lista - prices.oferta, 0);
+    const prices = region ? getActivePrices(product, region) : null;
+    const savings = prices ? Math.max(prices.lista - prices.oferta, 0) : 0;
     const activeVariant = product.variantes.find(
         (variant) =>
             variant.tela === selectedBaseTela || variant.tela === selectedFrenteTela,
@@ -522,53 +490,34 @@ export default function ProductDetailPage() {
                         </div>
 
                         <div className="mt-6">
-                            {prices.lista > prices.oferta && (
-                                <div className="text-base font-semibold text-zinc-400 line-through">
-                                    {formatCurrency(prices.lista)}
+                            {hasValidPostalCode && prices ? (
+                                <>
+                                    {prices.lista > prices.oferta && (
+                                        <div className="text-base font-semibold text-zinc-400 line-through">
+                                            {formatCurrency(prices.lista)}
+                                        </div>
+                                    )}
+                                    <div className="mt-1 flex flex-wrap items-center gap-4">
+                                        <span className="text-4xl font-black text-[#d12d3d]">
+                                            {formatCurrency(prices.oferta)}
+                                        </span>
+                                        {savings > 0 && (
+                                            <span className="rounded-full bg-[#fde8eb] px-4 py-2 text-sm font-extrabold text-[#d12d3d]">
+                                                Ahorras {formatCurrency(savings)}
+                                            </span>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 px-4 py-4 text-sm font-semibold text-zinc-600">
+                                    Ingresa tu C.P. en el navbar para ver el precio de este producto.
                                 </div>
                             )}
-                            <div className="mt-1 flex flex-wrap items-center gap-4">
-                                <span className="text-4xl font-black text-[#d12d3d]">
-                                    {formatCurrency(prices.oferta)}
-                                </span>
-                                {savings > 0 && (
-                                    <span className="rounded-full bg-[#fde8eb] px-4 py-2 text-sm font-extrabold text-[#d12d3d]">
-                                        Ahorras {formatCurrency(savings)}
-                                    </span>
-                                )}
-                            </div>
                         </div>
 
                         <p className="mt-6 max-w-2xl text-base font-medium leading-8 text-zinc-600">
                             Set premium con estructura de madera sólida estufada y acabados de alta costura a la medida del cliente.
                         </p>
-
-                        <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold text-zinc-600">
-                            <button
-                                type="button"
-                                onClick={() => setRegion("chiapas")}
-                                className={`rounded-full border px-3 py-2 ${region === "chiapas" ? "border-[#d12d3d] text-[#d12d3d]" : "border-zinc-200"
-                                    }`}
-                            >
-                                Chiapas
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setRegion("tabasco")}
-                                className={`rounded-full border px-3 py-2 ${region === "tabasco" ? "border-[#d12d3d] text-[#d12d3d]" : "border-zinc-200"
-                                    }`}
-                            >
-                                Tabasco
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setRegion("tapachula")}
-                                className={`rounded-full border px-3 py-2 ${region === "tapachula" ? "border-[#d12d3d] text-[#d12d3d]" : "border-zinc-200"
-                                    }`}
-                            >
-                                Tapachula
-                            </button>
-                        </div>
 
                         {hasConfiguration && (
                             <section className="mt-7 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
@@ -663,11 +612,13 @@ export default function ProductDetailPage() {
                     title="Artículos relacionados"
                     products={relatedProducts.slice(0, 3)}
                     region={region}
+                    hasValidPostalCode={hasValidPostalCode}
                 />
                 <ProductRail
                     title="Complementa con"
                     products={relatedProducts.slice(3, 6)}
                     region={region}
+                    hasValidPostalCode={hasValidPostalCode}
                 />
 
                 <ReviewsSection product={product} />
@@ -722,10 +673,12 @@ function ProductRail({
     title,
     products,
     region,
+    hasValidPostalCode,
 }: {
     title: string;
     products: RelatedProduct[];
-    region: Region;
+    region: "chiapas" | "tabasco" | "tapachula" | null;
+    hasValidPostalCode: boolean;
 }) {
     if (products.length === 0) return null;
 
@@ -734,7 +687,7 @@ function ProductRail({
             <h2 className="mb-5 text-2xl font-black text-zinc-900">{title}</h2>
             <div className="grid gap-5 sm:grid-cols-3">
                 {products.map((product) => {
-                    const prices = getActivePrices(product, region);
+                    const prices = region ? getActivePrices(product, region) : null;
 
                     return (
                         <article
@@ -766,14 +719,22 @@ function ProductRail({
                                 <h3 className="mt-1 line-clamp-2 min-h-10 text-sm font-extrabold text-zinc-800">
                                     {product.nombre}
                                 </h3>
-                                {prices.lista > prices.oferta && (
-                                    <div className="mt-2 text-xs font-semibold text-zinc-400 line-through">
-                                        {formatCurrency(prices.lista)}
+                                {hasValidPostalCode && prices ? (
+                                    <>
+                                        {prices.lista > prices.oferta && (
+                                            <div className="mt-2 text-xs font-semibold text-zinc-400 line-through">
+                                                {formatCurrency(prices.lista)}
+                                            </div>
+                                        )}
+                                        <div className="text-2xl font-black text-[#d12d3d]">
+                                            {formatCurrency(prices.oferta)}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="mt-2 rounded-md border border-dashed border-zinc-300 px-2 py-1 text-[11px] font-semibold text-zinc-500">
+                                        Ingresa C.P. para ver precio
                                     </div>
                                 )}
-                                <div className="text-2xl font-black text-[#d12d3d]">
-                                    {formatCurrency(prices.oferta)}
-                                </div>
                                 <Link
                                     href={`/producto/${product.id}?categoria=${encodeURIComponent(product.categoria)}`}
                                     className="mt-4 block rounded-lg bg-[#d12d3d] px-4 py-3 text-center text-sm font-extrabold text-white transition hover:bg-[#b72432]"
