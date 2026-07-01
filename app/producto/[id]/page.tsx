@@ -2,29 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
     Armchair,
     ChevronDown,
     ChevronUp,
-    Mail,
-    MapPin,
-    Menu,
     Minus,
-    Phone,
     Plus,
-    Search,
     ShoppingCart,
     Star,
     Tv,
-    User,
-    X,
 } from "lucide-react";
-import {
-    CATEGORY_COLOR_CLASSES,
-    CATEGORY_NAV_ITEMS,
-    normalizeCategoryToNavKey,
-} from "@/lib/categoryNavigation";
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
@@ -277,20 +265,9 @@ function WhatsAppIcon({ className }: { className?: string }) {
     );
 }
 
-function SocialIcon({ label, children }: { label: string; children: React.ReactNode }) {
-    return (
-        <span
-            aria-label={label}
-            className="grid h-9 w-9 place-items-center rounded-md border border-white/10 bg-white/5 text-zinc-400"
-        >
-            {children}
-        </span>
-    );
-}
 
 export default function ProductDetailPage() {
     const params = useParams<{ id: string }>();
-    const searchParams = useSearchParams();
     const id = params?.id;
     const [product, setProduct] = useState<ProductDetail | null>(null);
     const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
@@ -300,7 +277,6 @@ export default function ProductDetailPage() {
     const [selectedGalleryImage, setSelectedGalleryImage] = useState("");
     const [quantity, setQuantity] = useState(1);
     const [region, setRegion] = useState<Region>("chiapas");
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [specsOpen, setSpecsOpen] = useState(true);
 
     useEffect(() => {
@@ -422,25 +398,7 @@ export default function ProductDetailPage() {
         .map((variant) => getStrapiMedia(variant.imagen))
         .filter((image): image is string => Boolean(image));
     const thumbnails = Array.from(new Set([...galleryImages, ...variantImages])).slice(0, 5);
-    const queryCategory = searchParams.get("categoria") || searchParams.get("cat");
-    const activeCategory =
-        normalizeCategoryToNavKey(product.categoria) || normalizeCategoryToNavKey(queryCategory);
 
-    function getCategoryLinkClass(href: string, key?: keyof typeof CATEGORY_COLOR_CLASSES) {
-        if (key && activeCategory === key) {
-            return `${CATEGORY_COLOR_CLASSES[key].active} transition`;
-        }
-
-        if (key) {
-            return `hover:font-semibold text-zinc-600 ${CATEGORY_COLOR_CLASSES[key].hover} transition`;
-        }
-
-        if (href === "/") {
-            return "text-[#d12d3d] transition";
-        }
-
-        return "text-zinc-600 hover:text-[#d12d3d] transition";
-    }
 
     return (
         <div className="min-h-screen bg-[#f5f5f6] text-[#202124]">
@@ -916,109 +874,6 @@ function ReviewsSection({ product }: { product: ProductDetail }) {
                 </div>
             </div>
         </section>
-    );
-}
-
-function Newsletter() {
-    return (
-        <section className="mt-10 bg-[#f1f1f2] px-4 py-9">
-            <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-[1fr_420px] md:items-center">
-                <div>
-                    <h2 className="text-2xl font-black text-zinc-800">Recibe nuestras ofertas</h2>
-                    <p className="mt-2 text-sm font-semibold text-zinc-500">
-                        Suscríbete y sé el primero en enterarte de descuentos y nuevos modelos
-                    </p>
-                </div>
-                <form className="flex gap-3">
-                    <label className="sr-only" htmlFor="newsletter-email">
-                        Correo electrónico
-                    </label>
-                    <input
-                        id="newsletter-email"
-                        type="email"
-                        placeholder="tu@correo.com"
-                        className="h-12 min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-4 text-sm outline-none"
-                    />
-                    <button
-                        type="button"
-                        className="h-12 rounded-lg bg-[#d12d3d] px-7 text-sm font-extrabold text-white"
-                    >
-                        Suscribirme
-                    </button>
-                </form>
-            </div>
-        </section>
-    );
-}
-
-function Footer() {
-    return (
-        <footer className="bg-[#18181b] text-zinc-500">
-            <div className="mx-auto grid max-w-5xl gap-10 px-4 py-12 md:grid-cols-[1.5fr_0.7fr_0.7fr_1fr]">
-                <div>
-                    <img
-                        src="/images/logo.png"
-                        alt="Mueblerías Ahorramás"
-                        className="h-12 w-auto object-contain"
-                    />
-                    <p className="mt-7 max-w-xs text-sm leading-6">
-                        La cadena de mueblerías número 1 en Chiapas y Tabasco. Calidad y elegancia a precios inigualables desde 2003.
-                    </p>
-                    <div className="mt-5 flex gap-3">
-                        <SocialIcon label="Facebook">
-                            <span className="text-lg font-black">f</span>
-                        </SocialIcon>
-                        <SocialIcon label="Instagram">
-                            <span className="h-4 w-4 rounded border-2 border-current" />
-                        </SocialIcon>
-                        <SocialIcon label="WhatsApp">
-                            <WhatsAppIcon className="h-5 w-5" />
-                        </SocialIcon>
-                    </div>
-                </div>
-
-                <FooterColumn title="Categorías" items={["Salas", "Recámaras", "Comedores", "Muebles TV", "Colchones"]} />
-                <FooterColumn title="Empresa" items={["Sobre nosotros", "Sucursales", "Política de privacidad"]} />
-
-                <div>
-                    <h3 className="text-sm font-extrabold text-zinc-300">Contacto</h3>
-                    <div className="mt-4 space-y-3 text-sm">
-                        <p className="flex items-center gap-2">
-                            <Phone className="h-4 w-4" />
-                            9632684589
-                        </p>
-                        <p className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            Las Margaritas, Chiapas, México
-                        </p>
-                        <p className="flex items-center gap-2">
-                            <Mail className="h-4 w-4" />
-                            info@muebleriasahorramas.com.mx
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div className="border-t border-white/5 px-4 py-5 text-center text-xs">
-                Copyright © 2003 Mueblerías Ahorra Mas. Todos los derechos reservados.
-            </div>
-        </footer>
-    );
-}
-
-function FooterColumn({ title, items }: { title: string; items: string[] }) {
-    return (
-        <div>
-            <h3 className="text-sm font-extrabold text-zinc-300">{title}</h3>
-            <ul className="mt-4 space-y-2 text-sm">
-                {items.map((item) => (
-                    <li key={item}>
-                        <Link href="#" className="hover:text-white">
-                            {item}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        </div>
     );
 }
 

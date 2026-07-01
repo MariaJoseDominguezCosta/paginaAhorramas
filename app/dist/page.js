@@ -51,9 +51,7 @@ function getStrapiMedia(url) {
 }
 function HomePage() {
     var _a = react_1.useState([]), products = _a[0], setProducts = _a[1];
-    var _b = react_1.useState(""), searchQuery = _b[0], setSearchQuery = _b[1];
-    var _c = react_1.useState(true), loading = _c[0], setLoading = _c[1];
-    var _d = react_1.useState(false), mobileMenuOpen = _d[0], setMobileMenuOpen = _d[1]; // Control del menú lateral en móviles [4]
+    var _b = react_1.useState(true), loading = _b[0], setLoading = _b[1];
     // Carga de datos de Strapi en el cliente
     react_1.useEffect(function () {
         function loadProducts() {
@@ -118,39 +116,7 @@ function HomePage() {
         }
         loadProducts();
     }, []);
-    // Manejar el cambio de texto del buscador
-    var handleSearchChange = function (e) {
-        setSearchQuery(e.target.value);
-    };
-    // Filtrado de productos en tiempo real por nombre o categoría
-    var filteredProducts = products.filter(function (product) {
-        var query = searchQuery.toLowerCase().trim();
-        return (product.nombre.toLowerCase().includes(query) ||
-            product.categoria.toLowerCase().includes(query));
-    });
-    return (react_1["default"].createElement("div", { className: "bg-[#FAFAFA] min-h-screen text-[#1A1A1A] font-sans antialiased" }, searchQuery.trim().length > 0 ? (
-    /* VISTA DE RESULTADOS DE BÚSQUEDA EN TIEMPO REAL */
-    react_1["default"].createElement("section", { className: "max-w-7xl mx-auto px-6 mt-12 mb-20 min-h-[400px]" },
-        react_1["default"].createElement("div", { className: "mb-6" },
-            react_1["default"].createElement("h3", { className: "text-2xl font-extrabold font-title flex items-center gap-1.5" },
-                "Resultados de b\u00FAsqueda para: ",
-                react_1["default"].createElement("span", { className: "text-[#CE2C3C]" },
-                    "'",
-                    searchQuery,
-                    "'")),
-            react_1["default"].createElement("p", { className: "text-sm text-[#626264] mt-0.5" },
-                filteredProducts.length,
-                " productos encontrados")),
-        filteredProducts.length === 0 ? (react_1["default"].createElement("div", { className: "text-center py-16 text-zinc-500" }, "No se encontraron muebles que coincidan con tu b\u00FAsqueda.")) : (react_1["default"].createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center" }, filteredProducts.map(function (item) { return (react_1["default"].createElement("div", { key: "search-" + item.id, className: "w-full max-w-[320px] bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]" },
-            react_1["default"].createElement("div", { className: "bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden" },
-                item.badge_oferta && (react_1["default"].createElement("span", { className: "absolute top-2 left-2 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full z-10" }, item.badge_oferta)),
-                item.imagenUrl ? (react_1["default"].createElement("img", { src: item.imagenUrl, alt: item.nombre, className: "w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" })) : (react_1["default"].createElement("span", { className: "text-5xl opacity-80" }, item.foto_icono))),
-            react_1["default"].createElement("div", { className: "p-4" },
-                react_1["default"].createElement("span", { className: "text-[10px] font-bold text-[#626264] tracking-wider uppercase" }, item.categoria),
-                react_1["default"].createElement("h4", { className: "font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2" }, item.nombre),
-                react_1["default"].createElement(link_1["default"], { href: "/producto/" + item.id + "?categoria=" + encodeURIComponent(item.categoria), className: "block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition" }, "Ver producto")))); }))))) : (
-    /* VISTA DE PORTADA ESTÁNDAR (Cuando el buscador está vacío) */
-    react_1["default"].createElement(react_1["default"].Fragment, null,
+    return (react_1["default"].createElement("div", { className: "bg-[#FAFAFA] min-h-screen text-[#1A1A1A] font-sans antialiased" },
         react_1["default"].createElement("section", { className: "max-w-7xl mx-auto px-6 mt-6" },
             react_1["default"].createElement("div", { className: "bg-gradient-to-r from-[#FCE8EA] to-[#FCDCE1] rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 border border-[#E4E4E7] overflow-hidden relative" },
                 react_1["default"].createElement("div", { className: "max-w-lg z-10" },
@@ -218,6 +184,6 @@ function HomePage() {
                 react_1["default"].createElement("div", { className: "p-4" },
                     react_1["default"].createElement("span", { className: "text-[10px] font-bold text-[#626264] tracking-wider uppercase" }, item.categoria),
                     react_1["default"].createElement("h4", { className: "font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2" }, item.nombre),
-                    react_1["default"].createElement(link_1["default"], { href: "/producto/" + item.id + "?categoria=" + encodeURIComponent(item.categoria), className: "block w-full bg-[#CE2C3C] text-[#FAFAFA] text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition" }, "Ver producto")))); })))))));
+                    react_1["default"].createElement(link_1["default"], { href: "/producto/" + item.id + "?categoria=" + encodeURIComponent(item.categoria), className: "block w-full bg-[#CE2C3C] text-[#FAFAFA] text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition" }, "Ver producto")))); })))));
 }
 exports["default"] = HomePage;
