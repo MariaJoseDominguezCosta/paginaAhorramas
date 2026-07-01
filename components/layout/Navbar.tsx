@@ -13,7 +13,7 @@ import {
 import { normalizePostalCode, type Region } from "@/lib/location";
 import { useLocation } from "@/components/providers/LocationProvider";
 
-const POSTAL_MODAL_DISMISSED_KEY = "ahorramas.postalModalDismissed";
+const POSTAL_MODAL_DISMISSED_KEY = "ahorramas_postal_modal_dismissed";
 
 function formatRegionLabel(region: Region): string {
     if (region === "chiapas") return "Chiapas";
@@ -189,14 +189,14 @@ export default function Navbar() {
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="p-1 text-[#626264] hover:text-[#CE2C3C] transition md:hidden focus:outline-none"
-                        aria-label="Abrir men˙"
+                        aria-label="Abrir men√∫"
                     >
                         {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
 
                     <div className="items-center sm:hidden md:flex flex-col gap-2 w-auto object-contain ">
                         <Link href="/">
-                            <img src="/images/logo.png" alt="MueblerÌas Ahorram·s" className="md:h-12 w-auto object-contain" />
+                            <img src="/images/logo.png" alt="Muebler√≠as Ahorram√°s" className="md:h-12 w-auto object-contain" />
                         </Link>
                         <div className="flex items-center gap-1.5 text-xs text-[#626264]">
                             <MapPin className="w-4 h-4 text-zinc-800" />
@@ -242,7 +242,7 @@ export default function Navbar() {
                                 onFocus={() => setIsNavbarSearching(true)}
                                 onBlur={stopNavbarSearchSync}
                                 onChange={(event) => handleNavbarQueryChange(event.target.value)}
-                                placeholder="Busca salas, rec·maras, comedores, colchones ..."
+                                placeholder="Busca salas, rec√°maras, comedores, colchones ..."
                                 className="w-full bg-[#FAFAFA] border border-zinc-300 rounded-full py-2.5 px-5 pr-12 text-sm text-[#1A1A1A] placeholder-zinc-500 outline-none focus:border-[#CE2C3C] focus:bg-white transition shadow-inner"
                             />
                             <Search className="w-5 h-5 text-zinc-600 absolute right-4 cursor-pointer" />
@@ -268,7 +268,7 @@ export default function Navbar() {
                             </button>
                         </div>
                         <button className="sm:hidden md:flex bg-[#CE2C3C] text-white px-3 py-1.5 rounded-full text-sm font-bold hover:bg-[#A8202D] transition shadow-sm">
-                            Cont·ctanos
+                            Cont√°ctanos
                         </button>
                     </div>
 
@@ -280,14 +280,14 @@ export default function Navbar() {
                                 onFocus={() => setIsNavbarSearching(true)}
                                 onBlur={stopNavbarSearchSync}
                                 onChange={(event) => handleNavbarQueryChange(event.target.value)}
-                                placeholder="Busca salas, rec·maras, comedores..."
+                                placeholder="Busca salas, rec√°maras, comedores..."
                                 className="w-full bg-white border border-zinc-300 rounded-full py-2 px-4 pr-10 text-sm outline-none focus:border-[#CE2C3C] transition shadow-sm"
                             />
                             <Search className="w-4 h-4 text-[#626264] absolute right-3" />
                         </form>
 
                         <div className="flex items-center gap-1 text-[11px] text-[#626264] mt-1">
-                            <span>??</span>
+                            <span>üìç</span>
                             <button
                                 type="button"
                                 onClick={openPostalModal}
@@ -318,7 +318,7 @@ export default function Navbar() {
             <div className={`fixed inset-y-0 left-0 bg-white w-64 border-r border-[#E4E4E7] shadow-lg transform transition-transform duration-300 ease-in-out z-50 p-6 flex flex-col gap-6 md:hidden ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
                 <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
                     <Link href="/" className="flex align-center justify-center flex-1">
-                        <img src="/images/logo.png" alt="MueblerÌas Ahorram·s" className="h-8 md:h-12 w-auto object-contain" />
+                        <img src="/images/logo.png" alt="Muebler√≠as Ahorram√°s" className="h-8 md:h-12 w-auto object-contain" />
                     </Link>
                     <button onClick={() => setMobileMenuOpen(false)} className="text-[#626264] hover:text-[#CE2C3C]">
                         <X className="w-6 h-6" />
@@ -338,7 +338,7 @@ export default function Navbar() {
                 </div>
                 <div className="border-t border-[#E4E4E7] pt-4 mt-auto">
                     <button className="w-full bg-[#CE2C3C] text-white py-2 rounded-md text-xs font-bold hover:bg-[#A8202D] transition shadow-sm mb-3">
-                        Cont·ctanos
+                        Cont√°ctanos
                     </button>
                 </div>
             </div>
@@ -348,7 +348,7 @@ export default function Navbar() {
                     <div className="w-full max-w-md rounded-3xl bg-[#f1f1f2] p-6 shadow-xl border border-zinc-200">
                         <div className="flex items-start justify-between gap-3">
                             <div>
-                                <h3 className="text-2xl font-extrabold text-zinc-900">Selecciona tu RegiÛn de EnvÌo</h3>
+                                <h3 className="text-2xl font-extrabold text-zinc-900">Selecciona tu Regi√≥n de Env√≠o</h3>
                                 <p className="mt-1 text-sm text-zinc-500">
                                     Manejamos diferentes costos de cobertura para Chiapas y Tabasco.
                                 </p>
@@ -382,7 +382,7 @@ export default function Navbar() {
                                 type="submit"
                                 className="w-full rounded-xl bg-[#CE2C3C] px-4 py-3 text-base font-bold text-white hover:bg-[#A8202D]"
                             >
-                                Aplicar CÛdigo Postal
+                                Aplicar C√≥digo Postal
                             </button>
                         </form>
 
