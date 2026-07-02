@@ -342,7 +342,7 @@ export default function Navbar() {
             </div>
 
             {isPostalModalVisible && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/35 px-4" role="dialog" aria-modal="true" aria-label="Seleccion de codigo postal">
+                <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/35 px-4" role="dialog" aria-modal="true" aria-label="Seleccion de codigo postal">
                     <div className="w-full max-w-md rounded-3xl bg-[#f1f1f2] p-6 shadow-xl border border-zinc-200">
                         <div className="flex items-start justify-between gap-3">
                             <div>
