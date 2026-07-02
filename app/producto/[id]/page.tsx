@@ -261,7 +261,7 @@ export default function ProductDetailPage() {
                 ]);
 
                 if (!resDetail.ok || !resCatalog.ok) {
-                    throw new Error("No se pudo cargar la informacion del producto.");
+                    throw new Error("No se pudo cargar la información del producto.");
                 }
 
                 const [jsonDetail, jsonCatalog] = await Promise.all([
