@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-
-// Configuración de Strapi URL
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+import { fetchAPI, getStrapiMedia } from "@/lib/api";
 
 // Interfaz para el tipado interno de productos en Next.js
 interface Product {
@@ -63,7 +61,7 @@ interface StrapiMueblesResponse {
 // Tipado del Banner
 interface BannerData {
   imagen_banner: string | null;
-  link_destino: string;
+  link_destino: string | null;
 }
 
 interface StrapiBannerImagen {
@@ -92,13 +90,41 @@ interface StrapiBannerResponse {
 
 const BANNER_FALLBACK: BannerData = {
   imagen_banner: null,
-  link_destino: "",
+  link_destino: null,
 };
 
-function getStrapiMedia(url: string | null) {
-  if (!url) return null;
-  if (url.startsWith("http") || url.startsWith("//")) return url;
-  return `${STRAPI_URL}${url}`;
+
+function getSafeBannerHref(link?: string): string | null {
+  if (!link) return null;
+
+  const trimmed = link.trim();
+
+  // Solo permitir rutas internas como:
+  // /
+  // /productos
+  // /categoria/salas
+  if (
+    trimmed.startsWith("/") &&
+    !trimmed.startsWith("//") &&
+    !trimmed.includes("\\")
+  ) {
+    return trimmed;
+  }
+
+  return null;
+}
+
+function ProductSkeleton() {
+  return (
+    <div className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden">
+      <div className="h-40 bg-zinc-200 animate-pulse" />
+      <div className="p-4 space-y-3">
+        <div className="h-3 bg-zinc-200 rounded animate-pulse" />
+        <div className="h-4 bg-zinc-200 rounded animate-pulse" />
+        <div className="h-10 bg-zinc-200 rounded animate-pulse" />
+      </div>
+    </div>
+  );
 }
 
 export default function HomePage() {
@@ -106,6 +132,7 @@ export default function HomePage() {
 
   // Ahora manejamos un arreglo de banners para el carrusel
   const [banners, setBanners] = useState<BannerData[]>([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -116,13 +143,12 @@ export default function HomePage() {
   useEffect(() => {
     async function loadBanners() {
       try {
+        setBannerLoading(true);
         // Consultamos los banners visibles sin limitar a 1 para poder armar el carrusel
-        const res = await fetch(
-          `${STRAPI_URL}/api/banner-homes?populate=*&filters[visualidad][$eq]=true&pagination[limit]=10`
+        const json: StrapiBannerResponse = await fetchAPI(
+          "banner-homes",
+          "populate=*&filters[visualidad][$eq]=true&pagination[limit]=10"
         );
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-        const json: StrapiBannerResponse = await res.json();
-
         if (json.data && json.data.length > 0) {
           const list: BannerData[] = json.data.map((item) => {
             const attrs = item.attributes || item;
@@ -130,17 +156,20 @@ export default function HomePage() {
             const imagenUrl = getStrapiMedia(imagenData?.url || null);
             return {
               imagen_banner: imagenUrl,
-              link_destino: attrs.link_destino || "",
+              link_destino: getSafeBannerHref(attrs.link_destino),
             };
           }).filter(b => b.imagen_banner !== null); // Filtramos los que no tengan imagen válida
 
-          setBanners(list);
+          setBanners(list.length > 0 ? list : [BANNER_FALLBACK]);
         } else {
           setBanners([BANNER_FALLBACK]);
         }
       } catch (error) {
-        console.error("Error al cargar banners, usando fallback...", error);
+        console.error("Error al cargar banners...", error);
+
         setBanners([BANNER_FALLBACK]);
+      } finally {
+        setBannerLoading(false);
       }
     }
 
@@ -171,10 +200,8 @@ export default function HomePage() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const res = await fetch(`${STRAPI_URL}/api/muebles?populate=*`);
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-        const json: StrapiMueblesResponse = await res.json();
-
+        const json: StrapiMueblesResponse =
+          await fetchAPI("muebles", "populate=*");
         const mapped = json.data.map((item: StrapiMueble) => {
           const attrs = item.attributes || item;
 
@@ -218,12 +245,18 @@ export default function HomePage() {
     loadProducts();
   }, []);
 
+  const offerProducts = products.filter(
+    (item) => item.badge_oferta || item.tipo_oferta
+  );
+
   return (
     <div className="bg-[#FAFAFA] min-h-screen text-[#1A1A1A] font-sans antialiased">
 
       {/* SECCIÓN DEL HERO BANNER (Carrusel) */}
       <section className="max-w-7xl mx-auto px-6 mt-6">
-        {banners.length > 0 && banners[0].imagen_banner ? (
+        {bannerLoading ? (
+          <div className="h-[180px] sm:h-[260px] md:h-[340px] lg:h-[380px] rounded-2xl bg-zinc-100 animate-pulse" />
+        ) : banners.length > 0 && banners[0].imagen_banner ? (
           <div
             className="relative w-full h-[180px] sm:h-[260px] md:h-[340px] lg:h-[380px] rounded-2xl overflow-hidden border border-[#E4E4E7] group"
             onMouseEnter={() => setIsPaused(true)}
@@ -252,7 +285,10 @@ export default function HomePage() {
 
                   {/* Imagen principal */}
                   {item.link_destino ? (
-                    <Link href={item.link_destino} className="relative z-10 w-full h-full block">
+                    <Link
+                      href={item.link_destino}
+                      className="relative z-10 w-full h-full block"
+                    >
                       <img
                         src={item.imagen_banner || ""}
                         alt="Banner promocional"
@@ -341,83 +377,14 @@ export default function HomePage() {
           <p className="text-sm text-[#626264] mt-0.5">Lo recién agregado en esta temporada</p>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-2">
-          {products.map((item) => (
-            <div key={`nuevo-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
-              <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
-                <span className="absolute top-2 left-2 bg-[#FEF9C3] text-[#854D0E] text-[10px] font-bold px-2 py-0.5 rounded-full z-10">Nuevo</span>
-                {item.imagenUrl ? (
-                  <img src={item.imagenUrl} alt={item.nombre} className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" />
-                ) : (
-                  <span className="text-5xl opacity-80">{item.foto_icono}</span>
-                )}
-              </div>
-              <div className="p-4">
-                <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
-                <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
-                <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
-                  Ver producto
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECCIÓN 2: FAVORITOS */}
-      <section className="max-w-7xl mx-auto px-6 mt-12">
-        <div className="mb-6">
-          <h3 className="text-2xl font-extrabold font-title">Favoritos</h3>
-          <p className="text-sm text-[#626264] mt-0.5">Los mejores calificados de los usuarios</p>
-        </div>
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {products.map((item) => (
-            <div key={`fav-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
-              <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
-                {item.imagenUrl ? (
-                  <img src={item.imagenUrl} alt={item.nombre} className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" />
-                ) : (
-                  <span className="text-5xl opacity-80">{item.foto_icono}</span>
-                )}
-              </div>
-              <div className="p-4">
-                <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
-                <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
-                <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
-                  Ver producto
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECCIÓN 3: EN OFERTA */}
-      <section className="max-w-7xl mx-auto px-6 mt-12">
-        <div className="mb-6">
-          <h3 className="text-2xl font-extrabold font-title">En <span className="text-[#CE2C3C]">oferta</span></h3>
-        </div>
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {/* Filtramos para renderizar únicamente productos que tengan badge o tipo de oferta asignados */}
-          {products
-            .filter((item) => item.badge_oferta || item.tipo_oferta)
-            .map((item) => (
-              <div key={`oferta-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+              <ProductSkeleton key={i} />
+            ))
+            : products.map((item) => (
+              <div key={`nuevo-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
                 <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
-
-                  {/* Solo muestra el badge superior si existe en Strapi */}
-                  {item.badge_oferta && (
-                    <span className="absolute top-2 left-2 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
-                      {item.badge_oferta}
-                    </span>
-                  )}
-
-                  {/* Solo muestra el badge inferior si existe en Strapi */}
-                  {item.tipo_oferta && (
-                    <span className="absolute bottom-2 right-2 bg-[#FDE8EA] text-[#A8202D] text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase z-10">
-                      {item.tipo_oferta}
-                    </span>
-                  )}
-
+                  <span className="absolute top-2 left-2 bg-[#FEF9C3] text-[#854D0E] text-[10px] font-bold px-2 py-0.5 rounded-full z-10">Nuevo</span>
                   {item.imagenUrl ? (
                     <img src={item.imagenUrl} alt={item.nombre} className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" />
                   ) : (
@@ -436,6 +403,98 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* SECCIÓN 2: FAVORITOS */}
+      <section className="max-w-7xl mx-auto px-6 mt-12">
+        <div className="mb-6">
+          <h3 className="text-2xl font-extrabold font-title">Favoritos</h3>
+          <p className="text-sm text-[#626264] mt-0.5">Los mejores calificados de los usuarios</p>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+              <ProductSkeleton key={i} />
+            ))
+            : products.map((item) => (
+              <div key={`fav-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+                <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
+                  {item.imagenUrl ? (
+                    <img src={item.imagenUrl} alt={item.nombre} className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" />
+                  ) : (
+                    <span className="text-5xl opacity-80">{item.foto_icono}</span>
+                  )}
+                </div>
+                <div className="p-4">
+                  <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
+                  <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
+                  <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
+                    Ver producto
+                  </Link>
+                </div>
+              </div>
+            ))}
+        </div>
+      </section>
+
+      {/* SECCIÓN 3: EN OFERTA */}
+      <section className="max-w-7xl mx-auto px-6 mt-12">
+        <div className="mb-6">
+          <h3 className="text-2xl font-extrabold font-title">En <span className="text-[#CE2C3C]">oferta</span></h3>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {/* Filtramos para renderizar únicamente productos que tengan badge o tipo de oferta asignados */}
+          {offerProducts.length > 0 ? (
+            loading
+              ? Array.from({ length: 4 }).map((_, i) => (
+                <ProductSkeleton key={i} />
+              ))
+              :
+              offerProducts.map((item) => (
+                <div key={`oferta-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+                  <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
+
+                    {/* Solo muestra el badge superior si existe en Strapi */}
+                    {item.badge_oferta && (
+                      <span className="absolute top-2 left-2 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
+                        {item.badge_oferta}
+                      </span>
+                    )}
+
+                    {/* Solo muestra el badge inferior si existe en Strapi */}
+                    {item.tipo_oferta && (
+                      <span className="absolute bottom-2 right-2 bg-[#FDE8EA] text-[#A8202D] text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase z-10">
+                        {item.tipo_oferta}
+                      </span>
+                    )}
+
+                    {item.imagenUrl ? (
+                      <img src={item.imagenUrl} alt={item.nombre} className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" />
+                    ) : (
+                      <span className="text-5xl opacity-80">{item.foto_icono}</span>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
+                    <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
+                    <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-white text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
+                      Ver producto
+                    </Link>
+                  </div>
+                </div>
+              ))
+          ) : (
+            <div className="w-full rounded-xl border border-dashed border-zinc-300 bg-zinc-50 py-10 text-center">
+              <h4 className="text-lg font-semibold text-zinc-700">
+                No hay ofertas disponibles
+              </h4>
+
+              <p className="mt-2 text-sm text-zinc-500">
+                Vuelve pronto para descubrir nuevas promociones.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* SECCIÓN 4: PRODUCTOS DESTACADOS */}
       <section className="max-w-7xl mx-auto px-6 mt-12 mb-16">
         <div className="mb-6">
@@ -443,26 +502,30 @@ export default function HomePage() {
           <p className="text-sm text-[#626264] mt-0.5">Los más vendidos de esta temporada</p>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-2">
-          {products.map((item) => (
-            <div key={`destacado-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
-              <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
-                <span className="absolute top-2 left-2 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full z-10">{item.badge_oferta || "Oferta 30%"}</span>
-                <span className="absolute bottom-2 right-2 bg-[#FDE8EA] text-[#A8202D] text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase z-10">{item.tipo_oferta || "Hot Sale"}</span>
-                {item.imagenUrl ? (
-                  <img src={item.imagenUrl} alt={item.nombre} className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" />
-                ) : (
-                  <span className="text-5xl opacity-80">{item.foto_icono}</span>
-                )}
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+              <ProductSkeleton key={i} />
+            ))
+            : products.map((item) => (
+              <div key={`destacado-${item.id}`} className="w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] min-w-[240px] max-w-[320px] shrink-0 bg-white border border-[#E4E4E7] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#CE2C3C]">
+                <div className="bg-[#F4F4F5] h-40 flex items-center justify-center relative overflow-hidden">
+                  <span className="absolute top-2 left-2 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full z-10">{item.badge_oferta || "Oferta 30%"}</span>
+                  <span className="absolute bottom-2 right-2 bg-[#FDE8EA] text-[#A8202D] text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase z-10">{item.tipo_oferta || "Hot Sale"}</span>
+                  {item.imagenUrl ? (
+                    <img src={item.imagenUrl} alt={item.nombre} className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105" />
+                  ) : (
+                    <span className="text-5xl opacity-80">{item.foto_icono}</span>
+                  )}
+                </div>
+                <div className="p-4">
+                  <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
+                  <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
+                  <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-[#FAFAFA] text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
+                    Ver producto
+                  </Link>
+                </div>
               </div>
-              <div className="p-4">
-                <span className="text-[10px] font-bold text-[#626264] tracking-wider uppercase">{item.categoria}</span>
-                <h4 className="font-bold text-sm text-[#1A1A1A] mt-1 mb-4 h-10 line-clamp-2">{item.nombre}</h4>
-                <Link href={`/producto/${item.id}?categoria=${encodeURIComponent(item.categoria)}`} className="block w-full bg-[#CE2C3C] text-[#FAFAFA] text-xs font-bold py-2.5 rounded-md text-center hover:bg-[#A8202D] transition">
-                  Ver producto
-                </Link>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
     </div>

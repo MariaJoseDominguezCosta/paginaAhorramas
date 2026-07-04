@@ -1,8 +1,16 @@
 // src/lib/api.ts
 
 const STRAPI_URL =
-  process.env.NEXT_PUBLIC_STRAPI_URL;
+  process.env.NEXT_PUBLIC_STRAPI_URL ??
+  (process.env.NODE_ENV === "development"
+    ? "http://localhost:1337"
+    : undefined);
 
+if (!STRAPI_URL) {
+  throw new Error(
+    "Missing NEXT_PUBLIC_STRAPI_URL. Please define it in your environment variables.",
+  );
+}
 /**
  * Ayudante para realizar peticiones de forma limpia a Strapi
  * @param path Ruta del endpoint de la API (ej: "muebles")
@@ -23,8 +31,7 @@ export async function fetchAPI(path: string, query?: string) {
     );
   }
 
-  const json = await response.json();
-  return json;
+  return response.json();
 }
 
 /**

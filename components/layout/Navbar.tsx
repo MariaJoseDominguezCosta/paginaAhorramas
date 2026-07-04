@@ -185,7 +185,7 @@ export default function Navbar() {
     return (
         <nav className="bg-[#F4F4F5] border-b border-[#E4E4E7] sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex flex-col gap-3">
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="p-1 text-[#626264] hover:text-[#CE2C3C] transition md:hidden focus:outline-none"
@@ -194,7 +194,7 @@ export default function Navbar() {
                         {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
 
-                    <div className="items-center sm:hidden md:flex flex-col gap-2 w-auto object-contain ">
+                    <div className="hidden md:flex items-center flex-col gap-2 w-auto object-contain ">
                         <Link href="/">
                             <img src="/images/logo.png" alt="Mueblerías Ahorramás" className="md:h-12 w-auto object-contain" />
                         </Link>
