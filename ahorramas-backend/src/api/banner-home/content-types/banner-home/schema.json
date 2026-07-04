@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "banner_homes",
+  "info": {
+    "singularName": "banner-home",
+    "pluralName": "banner-homes",
+    "displayName": "BannerHome"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "link_destino": {
+      "type": "string"
+    },
+    "visualidad": {
+      "type": "boolean"
+    },
+    "imagen_banner": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

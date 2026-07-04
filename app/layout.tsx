@@ -5,7 +5,7 @@ import TrustBar from "@/components/layout/TrustBar";
 import Newsletter from "@/components/layout/Newsletter";
 import Footer from "@/components/layout/Footer";
 import { LocationProvider } from "@/components/providers/LocationProvider";
-import "../styles/tailwind.css"; 
+import "../styles/tailwind.css";
 import "../styles/index.css";
 
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   description: 'Discover premium furniture for every room in your home at Mueblerias Ahorramas. Shop living rooms, bedrooms, dining rooms, and TV furniture with exclusive discounts up to 40% off. Free shipping on select items and factory-direct pricing with quality guarantee.',
   keywords: 'furniture store, modern furniture, living room furniture, bedroom furniture, dining room furniture, salas, recámaras, comedores, home decor, furniture sale, discount furniture, quality furniture',
-  
+
   openGraph: {
     type: 'website',
     title: {
@@ -48,7 +48,7 @@ export default function RootLayout({
           <Newsletter />
           <Footer />
         </LocationProvider>
-        </body>
+      </body>
     </html>
   );
 }

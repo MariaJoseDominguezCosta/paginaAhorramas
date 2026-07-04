@@ -224,7 +224,7 @@ export default function Navbar() {
                                 </button>
                             )}
                         </div>
-                        
+
                         {hasValidPostalCode && region && (
                             <p className="text-[10px] font-semibold text-zinc-600">
                                 Zona activa: <span className="text-[#CE2C3C]">{formatRegionLabel(region)}</span>

@@ -47,3 +47,6 @@ next-env.d.ts
 /app/buscar/dist
 /data/postal-codes
 /app/api/newsletter/dist
+/ahorramas-backend/node_modules
+/ahorramas-backend/.tmp
+/ahorramas-backend/dist

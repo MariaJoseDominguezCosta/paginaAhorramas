@@ -16,7 +16,7 @@ import {
 import { useLocation } from "@/components/providers/LocationProvider";
 import { getActivePrices } from "@/lib/pricing";
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
 type ApplicationType = "Base" | "Frente" | "Ambos";
 type UnknownRecord = Record<string, unknown>;
