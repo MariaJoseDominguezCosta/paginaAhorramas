@@ -11,12 +11,23 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "slug": {
+      "type": "uid",
+      "targetField": "nombre"
+    },
     "nombre": {
       "type": "string",
       "required": true
     },
     "codigo_producto": {
       "type": "string"
+    },
+    "modelo": {
+      "type": "string",
+      "required": true
+    },
+    "descripcion_larga": {
+      "type": "blocks"
     },
     "imagen_producto": {
       "type": "media",
@@ -70,6 +81,14 @@
       "relation": "oneToMany",
       "target": "api::comentario.comentario",
       "mappedBy": "mueble"
+    },
+    "destacado": {
+      "type": "boolean",
+      "default": false
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

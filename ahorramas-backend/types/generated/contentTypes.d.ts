@@ -506,7 +506,7 @@ export interface ApiBannerHomeBannerHome extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    visualidad: Schema.Attribute.Boolean;
+    visualidad: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -521,6 +521,7 @@ export interface ApiCategoriaCategoria extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    activo: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -531,8 +532,9 @@ export interface ApiCategoriaCategoria extends Struct.CollectionTypeSchema {
       'api::categoria.categoria'
     > &
       Schema.Attribute.Private;
-    nombre: Schema.Attribute.String;
+    nombre: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'nombre'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -611,6 +613,7 @@ export interface ApiMuebleMueble extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    activo: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     badge_oferta: Schema.Attribute.String;
     calificacion: Schema.Attribute.Decimal;
     categoria: Schema.Attribute.Relation<
@@ -625,6 +628,8 @@ export interface ApiMuebleMueble extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    descripcion_larga: Schema.Attribute.Blocks;
+    destacado: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     imagen_producto: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios',
       true
@@ -635,6 +640,7 @@ export interface ApiMuebleMueble extends Struct.CollectionTypeSchema {
       'api::mueble.mueble'
     > &
       Schema.Attribute.Private;
+    modelo: Schema.Attribute.String & Schema.Attribute.Required;
     nombre: Schema.Attribute.String & Schema.Attribute.Required;
     precio_lista_chiapas: Schema.Attribute.Decimal;
     precio_lista_tabasco: Schema.Attribute.Decimal;
@@ -643,6 +649,7 @@ export interface ApiMuebleMueble extends Struct.CollectionTypeSchema {
     precio_oferta_tabasco: Schema.Attribute.Decimal;
     precio_oferta_tapachula: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'nombre'>;
     tipo_oferta: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

@@ -11,11 +11,20 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "slug": {
+      "type": "uid",
+      "targetField": "nombre"
+    },
     "nombre": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "icono": {
       "type": "string"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

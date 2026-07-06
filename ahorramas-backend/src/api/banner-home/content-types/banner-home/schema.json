@@ -15,7 +15,8 @@
       "type": "string"
     },
     "visualidad": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": true
     },
     "imagen_banner": {
       "type": "media",
