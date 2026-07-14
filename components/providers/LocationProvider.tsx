@@ -85,13 +85,13 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         const normalized = normalizePostalCode(value);
 
         if (!isPostalCodeFormatValid(normalized)) {
-            return { ok: false, message: "Ingresa un C.P. de 5 dígitos." };
+            return { ok: false, message: "Ingresa un Código Postal de 5 dígitos." };
         }
 
         const regions = getRegionsForPostalCode(normalized);
 
         if (regions.length === 0) {
-            return { ok: false, message: "No encontramos cobertura para ese C.P." };
+            return { ok: false, message: "No contamos con cobertura para ese Código Postal." };
         }
 
         const preferred = preferredRegionOverride ?? preferredRegion;
@@ -100,7 +100,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         if (!resolvedRegion) {
             return {
                 ok: false,
-                message: "Este C.P. existe en mas de una zona. Selecciona estado.",
+                message: "Este Código Postal existe en mas de una zona. Selecciona estado.",
                 ambiguousRegions: regions,
             };
         }
@@ -117,13 +117,13 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
     const setPreferredRegion = useCallback((nextRegion: Region) => {
         if (!postalCode) {
-            return { ok: false, message: "Primero ingresa un C.P." };
+            return { ok: false, message: "Primero ingresa un Código Postal." };
         }
 
         const regions = getRegionsForPostalCode(postalCode);
 
         if (!regions.includes(nextRegion)) {
-            return { ok: false, message: "La zona no coincide con ese C.P." };
+            return { ok: false, message: "La zona no coincide con ese Código Postal." };
         }
 
         setPreferredRegionState(nextRegion);

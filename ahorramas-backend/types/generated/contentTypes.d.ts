@@ -649,7 +649,6 @@ export interface ApiMuebleMueble extends Struct.CollectionTypeSchema {
     precio_oferta_tabasco: Schema.Attribute.Decimal;
     precio_oferta_tapachula: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'nombre'>;
     tipo_oferta: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

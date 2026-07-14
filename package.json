@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently -n \"next,strapi\" -c \"blue,green\" \"next dev\" \"npm run develop --prefix ahorramas-backend\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

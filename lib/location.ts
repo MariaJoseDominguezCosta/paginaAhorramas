@@ -19,7 +19,7 @@ const TAPACHULA_POSTAL_CODES = createPostalCodeSet(tapachulaPostalCodesRaw);
 const TABASCO_POSTAL_CODES = createPostalCodeSet(tabascoPostalCodesRaw);
 const CHIAPAS_POSTAL_CODES = createPostalCodeSet(chiapasPostalCodesRaw);
 
-// Fallback temporal mientras se completa la carga de C.P. reales.
+// Fallback temporal mientras se completa la carga de Códigos Postales reales.
 const TABASCO_PREFIXES = ["86"];
 const CHIAPAS_PREFIXES = ["29"];
 

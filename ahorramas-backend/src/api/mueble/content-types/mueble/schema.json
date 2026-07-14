@@ -11,10 +11,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "slug": {
-      "type": "uid",
-      "targetField": "nombre"
-    },
     "nombre": {
       "type": "string",
       "required": true

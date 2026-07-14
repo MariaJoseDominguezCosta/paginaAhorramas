@@ -510,7 +510,7 @@ export default function ProductDetailPage() {
                                 </>
                             ) : (
                                 <div className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 px-4 py-4 text-sm font-semibold text-zinc-600">
-                                    Ingresa tu C.P. en el navbar para ver el precio de este producto.
+                                    Ingresa tu Código Postal en el navbar para ver el precio de este producto.
                                 </div>
                             )}
                         </div>
@@ -732,7 +732,7 @@ function ProductRail({
                                     </>
                                 ) : (
                                     <div className="mt-2 rounded-md border border-dashed border-zinc-300 px-2 py-1 text-[11px] font-semibold text-zinc-500">
-                                        Ingresa C.P. para ver precio
+                                        Ingresa Código Postal para ver precio
                                     </div>
                                 )}
                                 <Link
@@ -839,7 +839,7 @@ function ReviewsSection({ product }: { product: ProductDetail }) {
 }
 
 function openWhatsApp(message: string) {
-    const phoneNumber = "529632684589";
+    const phoneNumber = "529632280432";
     const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
 }

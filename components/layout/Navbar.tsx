@@ -140,13 +140,13 @@ export default function Navbar() {
         const result = setPostalCode(postalCodeInput);
 
         if (!result.ok) {
-            setPostalCodeMessage(result.message || "No se pudo guardar el C.P.");
+            setPostalCodeMessage(result.message || "No se pudo guardar el Código Postal.");
             setPendingAmbiguousRegions(result.ambiguousRegions || []);
             return;
         }
 
         setPostalCodeInput(normalizePostalCode(postalCodeInput));
-        setPostalCodeMessage("C.P. guardado correctamente.");
+        setPostalCodeMessage("Código Postal guardado correctamente.");
         setPendingAmbiguousRegions([]);
         setPostalModalOpen(false);
         setPostalModalDismissedForSession(false);
@@ -171,7 +171,7 @@ export default function Navbar() {
     function handlePostalCodeClear() {
         clearPostalCode();
         setPostalCodeInput("");
-        setPostalCodeMessage("C.P. eliminado.");
+        setPostalCodeMessage("Código Postal eliminado.");
         setPendingAmbiguousRegions([]);
         setPostalModalDismissedForSession(false);
         clearPostalModalDismissal();
@@ -202,7 +202,7 @@ export default function Navbar() {
                             <MapPin className="w-4 h-4 text-zinc-800" />
                             {hasValidPostalCode ? (
                                 <span>
-                                    C.P. activo: <strong className="text-[#CE2C3C]">{postalCode}</strong>
+                                    Código Postal: <strong className="text-[#CE2C3C]">{postalCode}</strong>
                                 </span>
                             ) : (
                                 <span>Enviar a:</span>
@@ -212,7 +212,7 @@ export default function Navbar() {
                                 onClick={openPostalModal}
                                 className="text-[11px] font-bold underline text-[#CE2C3C] hover:text-[#A8202D]"
                             >
-                                {hasValidPostalCode ? "Cambiar C.P." : "Ingresar C.P."}
+                                {hasValidPostalCode ? "Cambiar C.P." : "Ingresar Código Postal"}
                             </button>
                             {hasValidPostalCode && (
                                 <button
@@ -291,7 +291,7 @@ export default function Navbar() {
                                 onClick={openPostalModal}
                                 className="rounded-md bg-[#CE2C3C] px-2 py-1 text-[10px] font-bold text-white"
                             >
-                                {hasValidPostalCode ? postalCode : "Ingresar C.P."}
+                                {hasValidPostalCode ? postalCode : "Ingresar Código Postal"}
                             </button>
                         </div>
                         {hasValidPostalCode && region && (
@@ -371,9 +371,9 @@ export default function Navbar() {
                                     setPostalCodeInput(normalizePostalCode(event.target.value));
                                     if (postalCodeMessage) setPostalCodeMessage("");
                                 }}
-                                placeholder="Ingresa tu C.P. (Ej.29000 o 86000)"
+                                placeholder="Ingresa tu Código Postal (Ej.29000 o 86000)"
                                 className="w-full rounded-xl border border-zinc-300 bg-[#f7f7f7] px-4 py-3 text-base text-zinc-700 outline-none focus:border-[#CE2C3C]"
-                                aria-label="Codigo postal"
+                                aria-label="Código Postal"
                             />
 
                             <button
