@@ -128,3 +128,5 @@ exports
 dist
 build
 .strapi-updater.json
+.strapi-cloud.json
+/.qodo
